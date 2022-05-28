@@ -5,37 +5,38 @@ The project will be a shopping list that will work in a similar way to pcpartpic
 
 Project task requirements:
 
-Minimal requirements:  
-Login page    
-User home page with all shopping lists    
-Add item page    
+Minimal requirements: 
+- Account creation page  
+- Login page    
+- User home page with all shopping lists    
+- Add item page    
 
 Standard requirements:  
-Login feature    
-Create user feature    
-Creating new shopping list feature    
-Delete/edit shopping list    
-Add item feature    
-delete/edit item    
-Instructions    
+- Login feature    
+- Language/Currency Feature   
+- Creating new shopping list feature    
+- Delete/edit shopping list    
+- Add item feature    
+- Delete/edit item    
+- Instructions    
 
 Stretch requirements:  
-Price matching for items  
-Price history charts for items  
-Animations in instructions page  
+- Price matching for items  
+- Price history charts for items  
+- Animations in instructions page  
 
 
 Dividing work:
 
 Login Page:  
-Text boxes to enter information  
-UI to make it look nice  
-Log in and create user buttons  
-Information on what project does  
-Link to instructions page  
+- Text boxes to enter information  
+- UI to make it look nice  
+- Log in and create user buttons  
+- Information on what project does  
+- Link to instructions page  
 
 User home page:  
-List of shopping lists by that user  
-Create new shopping list button  
-Delete shopping list button  
-Link to instructions page  
+- List of shopping lists by that user  
+- Create new shopping list button  
+- Delete shopping list button  
+- Link to instructions page  
