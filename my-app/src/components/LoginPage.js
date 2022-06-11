@@ -1,10 +1,13 @@
+import CreateAccount from './CreateAccount';
 import LoginCredentials from './LoginCredentials';
-import './style.css';
+import './style.css'
 
 function LoginPage() {
   return (
-    <div>
+    <div className="LoginPageInputs">
+      <h1>Insert App Name</h1>
       <LoginCredentials />
+      <CreateAccount />
     </div>
   );
 }
