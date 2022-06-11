@@ -16,7 +16,7 @@ function Sentence(props) {
 			<CardContent>
 				{sentence}
 				<br/>
-				<Button style={{position: 'absolute', right: '0px'}}> Comment </Button>
+				<Button style={{position: 'absolute', right: '5em', height: '1.5em', color: 'lavender', background: '#181818'}}> Comment </Button>
 			</CardContent>
 			</div>
 		</Card>

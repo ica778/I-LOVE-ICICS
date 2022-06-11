@@ -1,20 +1,21 @@
-import './style.css';
+import styles from "./CreateAccount.module.scss"
 
 function CreateAccount() {
     return (
-        <div className="CreateAccount">
-            <form>
+        <div className={styles.createBox}>
+            <form className={styles.formControl}>
                 <b>Create an Account</b>
-                <br />
+                
                 <input placeholder="First name" size="20"/>
                 <input placeholder="Surname" size="20"/>
-                <br />
+                
                 <input placeholder="Username" size="20"/>
-                <br />
+                
                 <input placeholder="Password" size="20"/>
                 <input placeholder="Re-enter Password" size="20"/>
-                <br />
-                <button>Create</button>
+                <div className={styles.controls}>
+                    <button>Create</button>    
+                </div>
             </form>
         </div>
     );

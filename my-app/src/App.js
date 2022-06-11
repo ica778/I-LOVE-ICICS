@@ -1,13 +1,23 @@
 import logo from './logo.svg';
 import './App.css';
-import LoginPage from './components/LoginPage';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import NavBar from './components/Navbar/NavBar';
 import MainPage from './components/MainPage';
+import LoginCredentials from './components/LoginCredentials';
+import CreateAccount from './components/CreateAccount';
+import UserProfile from './components/UserProfile'
 
 function App() {
   return (
-    <div className="App">
-      <MainPage />
-    </div>
+    <Router>
+      <NavBar />
+      <Routes>
+        <Route path='/' exact element={<LoginCredentials />} />
+        <Route path='/main' exact element={<MainPage />} />
+        <Route path='/user_profile' exact element={<UserProfile />} />
+        <Route path='/create_account' exact element={<CreateAccount />} />
+      </Routes>
+    </Router>
   );
 }
 
