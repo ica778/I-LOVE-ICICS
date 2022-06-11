@@ -1,18 +1,14 @@
 import './style.css';
 
 function LoginCredentials() {
-     return (
-        <div>
-            <h1>Login</h1>
+    return (
+        <div className="LoginCredentials">
             <form>
-                <input placeholder="Username"/>
-                <br />
-                <input placeholder="Password"/>
-            </form>
-            <div>
+                <b>Login</b>
+                <input placeholder="Username" size="20"/>
+                <input placeholder="Password" size="20"/>
                 <button>Login</button>
-                <button>Create Account</button>
-            </div>
+            </form>
         </div>
     );
 }

@@ -1,0 +1,23 @@
+.LoginCredentials {
+    width: 180px;
+    height: 95px;
+    text-align: left;
+    margin: 20px;
+}
+
+.CreateAccount {
+    width: 355px;
+    height: 120px;
+    text-align: left;
+    margin: 20px;
+}
+
+.LoginPageInputs {
+    background-color: aliceblue;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+    position: absolute;
+    margin: auto;
+}
