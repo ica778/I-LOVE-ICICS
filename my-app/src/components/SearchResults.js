@@ -6,17 +6,30 @@ import { useEffect } from 'react';
 
 function SearchResults(props) {
 	let { searchResults } = props;
-	searchResults = ['This is a sentence.', 'The quick brown fox jumps over the lazy dog.', 'The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.']
+	searchResults = [
+		{
+			sentence: 'This is a sentence.',
+			noComments: 2,
+		},
+		{
+			sentence: 'The quick brown fox jumps over the lazy dog.',
+			noComments: 3
+		},
+		{
+			sentence: 'The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.',
+			noComments: 0
+		},
+	];
 
 	useEffect(() => {
 		console.log("from search results!")
 		console.log(Array.isArray(searchResults))
 	  }, []);
 
-	const renderSentences = (sentences) => {
-		return Array.isArray(sentences) && sentences.map((sentence) => {
+	const renderSentences = (searchResults) => {
+		return Array.isArray(searchResults) && searchResults.map((searchResult) => {
 			return <li style={{width: '100%'}}>
-				<Sentence sentence={sentence}/>
+				<Sentence sentence={searchResult.sentence} noComments={searchResult.noComments}/>
 			</li>
 		})
 	}

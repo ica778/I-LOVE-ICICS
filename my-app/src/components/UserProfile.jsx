@@ -6,7 +6,7 @@ const UserProfile = () => {
     <div className={styles.container}>
       <div className={styles.article}>
         <span className={styles.header}>
-          Saved Sentences
+          Your Sentences
         </span>
         <p className={styles.content}>
            Example Text
@@ -15,7 +15,7 @@ const UserProfile = () => {
 
       <div className={styles.article}>
         <span className={styles.header}>
-          User Comments
+          Your Comments
         </span>
         <p className={styles.content}>
             Example Text
