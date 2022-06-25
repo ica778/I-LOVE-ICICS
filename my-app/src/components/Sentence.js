@@ -11,8 +11,16 @@ const Sentence = props => {
 	const [ currentCommentText, setCurrentCommentText ] = useState("");
 	const dispatch = useDispatch();
 
+	let currentComments = useSelector(function(state) {
+		return state.commentReducer.currentComments;
+    });
+
 	useEffect(() => {
-		console.log(noComments);
+		console.log(currentComments);
+		if (currentComments && sentenceBoxId in currentComments) {
+			setCommentSectionOpen(true);
+			setCurrentCommentText(currentComments[sentenceBoxId])
+		}
 	  }, []);
 
 	const handleCommentOpenButton = () => {
