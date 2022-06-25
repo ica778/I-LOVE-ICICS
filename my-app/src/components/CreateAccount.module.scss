@@ -1,0 +1,25 @@
+
+.createBox {
+    position: relative;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    margin-top: 15em;
+    padding: 1.5em;
+}
+
+.formControl {
+    display: flex;
+    flex-direction: column;
+    margin-right: 2em;
+}
+
+.controls {
+    width: 40%;
+    margin-top: 0.3em;  
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+}
+

@@ -1,18 +1,14 @@
-import './style.css';
+import styles from "./LoginCredentials.module.scss"
 
 function LoginCredentials() {
-     return (
-        <div>
-            <h1>Login</h1>
-            <form>
-                <input placeholder="Username"/>
-                <br />
-                <input placeholder="Password"/>
-            </form>
-            <div>
+    return (
+        <div className={styles.loginBox}>
+            <form className={styles.formControl}>
+                <b>Login</b>
+                <input placeholder="Username" size="20"/>
+                <input placeholder="Password" size="20"/>
                 <button>Login</button>
-                <button>Create Account</button>
-            </div>
+            </form>
         </div>
     );
 }
