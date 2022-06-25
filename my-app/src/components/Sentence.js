@@ -3,16 +3,25 @@ import Button from "@material-ui/core/Button";
 import { Card, CardContent, Typography, CardActions } from '@material-ui/core';
 import React, { useState, useEffect } from 'react';
 import { updateCurrentComments, updateUserId, eraseCurrentComment } from '../actions/index';
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import styles from './Sentence.module.scss'
 
 const Sentence = props => {
 	const { sentenceBoxId, sentence, noComments } = props;
-	const [ commentSectionOpen, setCommentSectionOpen ] = useState(false);
-	const [ currentCommentText, setCurrentCommentText ] = useState("");
+	const [commentSectionOpen, setCommentSectionOpen] = useState(false);
+	const [currentCommentText, setCurrentCommentText] = useState("");
 	const dispatch = useDispatch();
 
+	let currentComments = useSelector(function(state) {
+		return state.commentReducer.currentComments;
+    });
+
 	useEffect(() => {
-		console.log(noComments);
+		console.log(currentComments);
+		if (currentComments && sentenceBoxId in currentComments) {
+			setCommentSectionOpen(true);
+			setCurrentCommentText(currentComments[sentenceBoxId])
+		}
 	  }, []);
 
 	const handleCommentOpenButton = () => {
@@ -22,7 +31,7 @@ const Sentence = props => {
 
 	const handleCommentText = (e) => {
 		setCurrentCommentText(e.target.value);
-		dispatch(updateCurrentComments({sentenceBoxId, commentText: e.target.value}))
+		dispatch(updateCurrentComments({ sentenceBoxId, commentText: e.target.value }))
 	}
 
 	const handleCloseCommentSection = () => {
@@ -33,33 +42,37 @@ const Sentence = props => {
 	}
 
 	return (
-		<div>
-			<Card style={commentSectionOpen ? {padding: '7px'} : {padding: '7px', marginBottom: '20px'}}>
-				<div>
-				<CardContent>
-					{sentence}
-					<br/>
-					<Button onClick={handleCommentOpenButton} style={{position: 'absolute', right: '5em', height: '2em', color: 'lavender', background: '#181818'}}> +{noComments} Comment </Button>
-				</CardContent>
-				</div>
-			</Card>
-			{commentSectionOpen && <Card style={{marginTop: '10px', marginBottom: '20px'}}>
-				<CardContent>
-					<TextField
-					id="standard-multiline-flexible"
-					label="Comment"
-					multiline
-					maxRows={5}
-					value={currentCommentText}
-					onChange={handleCommentText}
-					variant="standard"
-					/>
-				</CardContent>
-				<CardActions>
-					<Button>Submit</Button>
-					<Button onClick={handleCloseCommentSection}>Cancel</Button>
-				</CardActions>
-			</Card>}
+		<div className={styles.outer}>
+			<div className={styles.container}>
+				<Card style={commentSectionOpen ? { padding: '7px' } : { padding: '7px', marginBottom: '20px' }}>
+					<div>
+						<CardContent>
+							{sentence}
+							<br />
+							<Button onClick={handleCommentOpenButton} style={{ position: 'absolute', right: '5em', height: '2em', color: 'lavender', background: '#181818' }}> +{noComments} Comment </Button>
+						</CardContent>
+					</div>
+				</Card>
+				{commentSectionOpen && <Card style={{ marginTop: '10px', marginBottom: '20px' }}>
+					<CardContent>
+						<TextField
+							id="standard-multiline-flexible"
+							label="Comment"
+							multiline
+							maxRows={5}
+							fullWidth
+							value={currentCommentText}
+							onChange={handleCommentText}
+							variant="outlined"
+							rows={5}
+						/>
+					</CardContent>
+					<CardActions>
+						<Button>Submit</Button>
+						<Button onClick={handleCloseCommentSection}>Cancel</Button>
+					</CardActions>
+				</Card>}
+			</div>
 		</div>
 	)
 }

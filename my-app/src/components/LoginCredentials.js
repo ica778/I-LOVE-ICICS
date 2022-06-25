@@ -1,6 +1,7 @@
 import { updateUserId } from '../actions/index';
 import { useDispatch } from 'react-redux';
 import { Button } from '@material-ui/core';
+import styles from './LoginCredentials.module.scss'
 
 function LoginCredentials() {
     const dispatch = useDispatch();
@@ -10,13 +11,13 @@ function LoginCredentials() {
     }
 
     return (
-        <div >
-            <form >
-                <b>Login</b>
+        <div className={styles.loginBox}>
+            <form className={styles.formControl}>
+                <label>Login</label>
                 <input placeholder="Username" size="20"/>
                 <input placeholder="Password" size="20"/>
             </form>
-            <Button onClick={handleLogin}>Login</Button>
+            <Button className={styles.input} onClick={handleLogin}>Login</Button>
         </div>
     );
 }

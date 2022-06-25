@@ -6,11 +6,9 @@ const commentReducer = (state = {currentComments: {}}, action) => {
                 currentComments: Object.assign({}, state.currentComments, {[action.payload.sentenceBoxId]: action.payload.commentText})
             };
         case 'ERASE_COMMENT':
-            const next = {...state};
-            console.log(next);
-            delete next.currentComments[action.payload]
-            console.log(next);
-            return next;
+            const next = {...state.currentComments};
+            delete next[action.payload]
+            return {...state, currentComments: next};
         default:
             return state;
     };
