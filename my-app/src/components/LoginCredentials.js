@@ -1,14 +1,22 @@
-import styles from "./LoginCredentials.module.scss"
+import { updateUserId } from '../actions/index';
+import { useDispatch } from 'react-redux';
+import { Button } from '@material-ui/core';
 
 function LoginCredentials() {
+    const dispatch = useDispatch();
+
+    const handleLogin = () => {
+        dispatch(updateUserId(1234));
+    }
+
     return (
-        <div className={styles.loginBox}>
-            <form className={styles.formControl}>
+        <div >
+            <form >
                 <b>Login</b>
                 <input placeholder="Username" size="20"/>
                 <input placeholder="Password" size="20"/>
-                <button>Login</button>
             </form>
+            <Button onClick={handleLogin}>Login</Button>
         </div>
     );
 }
