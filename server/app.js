@@ -7,24 +7,18 @@ var logger = require('morgan');
 const { Schema } = mongoose;
 
 mongoose.connect(
-    "mongodb://root:password@127.0.0.1:27017/public", 
+    "mongodb://127.0.0.1:27017/language_project", 
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
-    }
-).then(async () => {
-	const sentence = mongoose.model('sentence', new Schema({
-		text: String,
-	  }), 'sentence');
-	  const sentences = await sentence.find();
-	  console.log(sentences);
-}).catch((err) => {
+    }).catch((err) => {
 	console.log("encountered an ERROR!!!!");
 	console.log(err);
 });
 
 var indexRouter = require('./routes/index');
 var sentenceRouter = require('./routes/sentence');
+var userRouter = require('./routes/user');
 
 var app = express();
 
@@ -36,5 +30,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/sentence', sentenceRouter);
+app.use('/user', userRouter);
 
 module.exports = app;
