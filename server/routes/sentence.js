@@ -80,12 +80,23 @@ router.get('/search', async function (req, res, next) {
 		let searchText = req.query.search;
 		let aggregateArr = [];
 		if (searchText.includes('/')) {
-			// Find all "exact" matches requested (eg. by /bob went/ /to the pool/)
-			let exactWords = textsBetweenChar(searchText, '/');
-			console.log(exactWords);
-			for (let i of exactWords) {
+			if (!searchText.includes('//')) {
+				// Find all "exact" matches requested (eg. by /bob went/ /to the pool/)
+				let exactWords = textsBetweenChar(searchText, '/');
+				console.log(exactWords);
+				for (let i of exactWords) {
+					aggregateArr.push(
+						{ $match: { text: { $regex: new RegExp(i, "i") } } }
+					);
+				}
+			} else {
+				let exactWords = textsBetweenChar(searchText, '/');
+				exactWords = exactWords.filter((val) => {
+					return val !== '';
+				})
+				let regexString = exactWords.join('.*');
 				aggregateArr.push(
-					{ $match: { text: { $regex: new RegExp(i) } } }
+					{ $match: { text: { $regex: new RegExp(regexString, "i") } } }
 				);
 			}
 			searchText = searchText.slice(searchText.lastIndexOf('/') + 1);
@@ -94,20 +105,21 @@ router.get('/search', async function (req, res, next) {
 		// Find the "main" portion of text if there is one
 		let regexString = "";
 		let idxOfBackslash = searchText.indexOf('\\');
-		let searchTextArrNoNots = searchText;
+		let searchTextNoNots = searchText;
 		if (idxOfBackslash !== -1) {
-			searchTextArrNoNots = searchText.substring(0, idxOfBackslash);
+			searchTextNoNots = searchText.substring(0, idxOfBackslash);
 		}
 
-		let searchTextArr = searchTextArrNoNots.split(' ');
+		let searchTextArr = searchTextNoNots.split(' ');
 		for (let i of searchTextArr) {
 			if (i[0] === '{') {
-				regexString = regexString + ' ' + '([^\s]+)';
+				regexString = regexString + ' ' + '([^_]+)';
 			} else regexString = regexString + ' ' + i;
 		}
 		regexString = regexString.trim();
+		console.log(regexString);
 		aggregateArr.push(
-			{ $match: { text: { $regex: new RegExp(regexString)}}}
+			{ $match: { text: { $regex: new RegExp(regexString, "i")}}}
 		);
 		
 		// Find the parts to remove from text if there are any
@@ -117,13 +129,47 @@ router.get('/search', async function (req, res, next) {
 			let removeTextArr = textsBetweenChar(searchText, '\\');
 			for (let i of removeTextArr) {
 				aggregateArr.push(
-					{ $match: { text: { $regex: new RegExp('^(?!' + i + ' |.+ ' + i + ' .+|.+ ' + i + '$).*')}}}
+					{ $match: { text: { $regex: new RegExp('^(?!' + i + ' |.+ ' + i + ' .+|.+ ' + i + '$).*', "i") }}}
 				);
 			}
 		}
 
 		let searchRes = await Sentence.aggregate(aggregateArr);
-		return res.send(searchRes);
+		let returnRes = [];
+		let seenPosInSearchText = false;
+
+		for (let elt of searchRes) {
+			let text = elt.text;
+			let idx = text.search(regexString);
+			let counter = 0;
+			for (let i = 0; i < idx; i++) {
+				if (text[i] === ' ') {
+					counter++;
+				}
+			}
+			console.log('counter is ' + counter);
+			console.log(elt.posString)
+			console.log('orig string arr form is: ' + searchTextArr);
+			let includeCurrentElt = true;
+			// counter represents idx of the corresponding word to the searchText to start from 
+			for (let i = 0; i < searchTextArr.length; i++,counter++) {
+				if (searchTextArr[i][0] === '{') {
+					let posText = searchTextArr[i].slice(1, -1);
+					if (posText.length > 0) {
+						seenPosInSearchText = true;
+						if (posText !== elt.posString[counter]) {
+							includeCurrentElt = false;
+							break;
+						}
+					}
+				}
+			}
+
+			if (includeCurrentElt) returnRes.push(elt);
+		}
+		if (seenPosInSearchText) return res.send(returnRes);
+		else return res.send(searchRes);
+		
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
@@ -132,22 +178,22 @@ router.get('/search', async function (req, res, next) {
 
 router.post('/', async function(req, res, next) {
 	try {
-		let text = req.body.text;
-		let source = req.body.source;
-		let posString = "";
+		let text = req.body.text.trim();
+		let source = req.body.source ? req.body.source.trim() : '';
+		let posString = [];
 
 		let words = new pos.Lexer().lex(text);
 		let tagger = new pos.Tagger();
 		let taggedWords = tagger.tag(words);
 		for (let taggedWord of taggedWords) {
-			posString += ' ' + taggedWord[1].substring(0, 2);
+			posString.push(taggedWord[1].substring(0, 2));
 		}
-		posString = posString.trim();
-
+		console.log(posString);
 		let sentence = new Sentence({text: text, usefulnessRating: 0, source: source, posString: posString});
 		let sentenceSaved = await sentence.save();
 		return res.send(sentenceSaved);
 	} catch (err) {
+		console.log(err);
 		return res.status(500).send(err);
 	}
 });
