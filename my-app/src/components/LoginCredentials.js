@@ -2,11 +2,13 @@ import { updateUserId } from '../actions/index';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@material-ui/core';
 import styles from './LoginCredentials.module.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getUsersAsync } from '../redux/user/thunks';
 
 function LoginCredentials() {
     const dispatch = useDispatch();
+
+    const [userId, setUserId] = useState();
 
     const [usernameInput, setUsernameInput] = useState("");
     function setUsername(val) {
@@ -22,9 +24,23 @@ function LoginCredentials() {
         dispatch(getUsersAsync()).then(value => {
             let found = value.payload.find(element => element.username === usernameInput && element.password === passwordInput);
             if (found !== null) {
-                dispatch(updateUserId(found.username));
+                setUserId(found.username);
+                localStorage.setItem('userId', found.username);
             }
         });
+    }
+
+    const handleLogout = () => {
+        setUserId(-1);
+        localStorage.clear();
+    }
+
+    if (localStorage.getItem("userId")) {
+        return (
+            <div>
+                <Button onClick={handleLogout}>Logout</Button>
+            </div>
+        )
     }
 
     return (

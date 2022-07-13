@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './reducers';
 import { Provider } from 'react-redux';
+import axios from 'axios';
 
 const store = configureStore(
   {

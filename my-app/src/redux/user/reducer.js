@@ -3,7 +3,6 @@ import { REQUEST_STATE } from './utils';
 
 const INITIAL_STATE = {
     userId: -1
-
 }
 
 const userSlice = createSlice({
