@@ -19,6 +19,7 @@ mongoose.connect(
 var indexRouter = require('./routes/index');
 var sentenceRouter = require('./routes/sentence');
 var userRouter = require('./routes/user');
+var commentRouter = require('./routes/comment');
 
 var app = express();
 
@@ -31,5 +32,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/sentence', sentenceRouter);
 app.use('/user', userRouter);
+app.use('/comment', commentRouter);
 
 module.exports = app;
