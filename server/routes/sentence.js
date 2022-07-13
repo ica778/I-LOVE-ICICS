@@ -189,7 +189,7 @@ router.post('/', async function(req, res, next) {
 			posString.push(taggedWord[1].substring(0, 2));
 		}
 		console.log(posString);
-		let sentence = new Sentence({text: text, usefulnessRating: 0, source: source, posString: posString});
+		let sentence = new Sentence({text: text, usefulnessRating: 0, source: source, posString: posString, comments: []});
 		let sentenceSaved = await sentence.save();
 		return res.send(sentenceSaved);
 	} catch (err) {

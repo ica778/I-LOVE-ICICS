@@ -5,15 +5,12 @@ const bcrypt = require('bcrypt');
 
 /* GET users listing. */
 router.get('/', async function(req, res, next) {
-    console.log('1');
 	try {
         let ret = [];
 		const users = await User.find();
-        console.log('2');
         for (let o of users) {
             ret.push([o._id, o.username]);
         }
-        console.log('3');
         return res.send(ret);
 	} catch (err) {
 		return res.status(500).send(err);
@@ -53,7 +50,7 @@ router.post('/login/', async function(req, res, next) {
             let hash = obj.hash;
             bcrypt.compare(password, hash, function(err, result) {
                 if (result) {
-                    return res.send('logged in!');
+                    return res.send(obj._id);
                 } else {
                     return res.status(500).send('Error with login credentials.');
                 }
