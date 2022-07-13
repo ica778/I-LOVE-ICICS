@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@material-ui/core';
 import styles from './LoginCredentials.module.scss';
 import { useState } from 'react';
+import { getUsersAsync } from '../redux/user/thunks';
 
 function LoginCredentials() {
     const dispatch = useDispatch();
@@ -19,6 +20,9 @@ function LoginCredentials() {
 
     const handleLogin = () => {
         dispatch(updateUserId(usernameInput));
+        dispatch(getUsersAsync()).then(value => {
+            console.log(value);
+        });
     }
 
     return (
