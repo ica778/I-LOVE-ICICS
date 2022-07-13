@@ -19,9 +19,11 @@ function LoginCredentials() {
     }
 
     const handleLogin = () => {
-        dispatch(updateUserId(usernameInput));
         dispatch(getUsersAsync()).then(value => {
-            console.log(value);
+            let found = value.payload.find(element => element.username === usernameInput && element.password === passwordInput);
+            if (found !== null) {
+                dispatch(updateUserId(found.username));
+            }
         });
     }
 

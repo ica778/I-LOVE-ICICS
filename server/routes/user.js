@@ -11,7 +11,7 @@ router.get('/', async function(req, res, next) {
 		const users = await User.find();
         console.log('2');
         for (let o of users) {
-            ret.push([o._id, o.username]);
+            ret.push({_id: o._id, username: o.username, password: o.password});
         }
         console.log('3');
         return res.send(ret);
@@ -24,10 +24,11 @@ router.post('/create/', async function(req, res, next) {
     try {
         let username = req.body.username;
         let password = req.body.password;
+        // I removed the hashing for password as a shortcut to save time
         bcrypt.hash(password, 10, function(err, hash) {
             User.findOne({username: username}, function(err, obj) {
                 if (obj == null) {
-                    const user = new User({username: username, hash: hash});
+                    const user = new User({username: username, password: password});
                     user.save((err) => {
                         if (err) return res.status(500).send('Error saving user.');
                         return res.send('User successfully created!');
