@@ -1,9 +1,13 @@
-var mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { model, Schema } = require('mongoose');
+const { baseComment, Subcomment } = require('./subcomment');
 
-let commentSchema = new Schema({text: String, parentId: String, parentType: String, submittedBy: String, deleted: { type: Boolean, default: false }, responses: [{
-	// for storing comment ids
-	type: String,
-}]}, { timestamps: true });
+const comment = new Schema({
+  sentenceId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Sentence',
+  },
+  ...baseComment,
+  responses: [Subcomment],
+});
 
-module.exports = mongoose.model("Comment", commentSchema);
+module.exports = model('Comment', comment);
