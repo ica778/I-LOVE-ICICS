@@ -1,21 +1,21 @@
 .button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: lavender;
-    width: 20px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: lavender;
+  width: 20px;
 }
 
 .container {
-    position: relative;
-    display: flex;
-    flex-direction: column;;
-    padding: 1.5em;
-    border: 1px solid #181818;
-    margin: 1em;
-    transition: border 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5em;
+  border: 1px solid #181818;
+  margin: 1em;
+  transition: border 0.2s;
 
-    &:hover {
-        border: 2px solid orange;
-    }
+  &:hover {
+    border: 2px solid orange;
+  }
 }
