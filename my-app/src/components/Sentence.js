@@ -58,23 +58,29 @@ const Sentence = props => {
           }
         >
           <div>
-            <CardContent>
+            <CardContent
+              style={{
+                maxHeight: '200px',
+                overflow: 'scroll',
+              }}
+            >
               {sentence}
-              <br />
-              <Button
-                onClick={handleCommentOpenButton}
-                style={{
-                  position: 'absolute',
-                  right: '5em',
-                  height: '2em',
-                  color: 'lavender',
-                  background: '#181818',
-                }}
-              >
-                {' '}
-                +{noComments} Comment{' '}
-              </Button>
             </CardContent>
+
+            <Button
+              onClick={handleCommentOpenButton}
+              style={{
+                position: 'relative',
+                top: '4px',
+                left: '90%',
+                height: '2em',
+                color: 'lavender',
+                background: '#181818',
+              }}
+            >
+              {' '}
+              +{noComments} Comment{' '}
+            </Button>
           </div>
         </Card>
         {commentSectionOpen && (
@@ -84,12 +90,12 @@ const Sentence = props => {
                 id="standard-multiline-flexible"
                 label="Comment"
                 multiline
-                maxRows={5}
+                maxRows={3}
                 fullWidth
                 value={currentCommentText}
                 onChange={handleCommentText}
                 variant="outlined"
-                rows={5}
+                minRows={3}
               />
             </CardContent>
             <CardActions>

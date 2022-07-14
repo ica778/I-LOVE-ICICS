@@ -1,31 +1,32 @@
-import React from 'react'
-import { NavStyle, NavLogo, NavLink, NavBars, NavMenu } from './NavStyling'
+import React from 'react';
+import { NavStyle, NavLogo, NavLink, NavBars, NavMenu } from './NavStyling';
 
 const NavBar = () => {
   return (
     <>
       <NavStyle>
-        <NavLogo to='/main'>
-          Language Helper
-        </NavLogo>
+        <NavLogo to="/main">Language Helper</NavLogo>
         <NavBars />
         <NavMenu>
-          <NavLink to='/main' activestyle="true">
+          <NavLink to="/main" activestyle="true">
             Home
           </NavLink>
-          <NavLink to='/user_profile' activestyle="true">
+          <NavLink to="/explore" activestyle="true">
+            Explore
+          </NavLink>
+          <NavLink to="/user_profile" activestyle="true">
             User Profile
           </NavLink>
-          <NavLink to='/' activestyle="true">
+          <NavLink to="/" activestyle="true">
             Login
           </NavLink>
-          <NavLink to='/create_account' activestyle="true">
+          <NavLink to="/create_account" activestyle="true">
             Create Account
           </NavLink>
         </NavMenu>
       </NavStyle>
     </>
-  )
-}
+  );
+};
 
-export default NavBar
+export default NavBar;

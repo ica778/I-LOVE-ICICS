@@ -25,7 +25,7 @@ export const NavLogo = styled(Link)`
 
 export const NavLink = styled(Link)`
   color: lavender;
-  background-color: #181818; 
+  background-color: #181818;
   display: flex;
   align-items: center;
   text-decoration: none;
