@@ -35,10 +35,15 @@ function LoginCredentials() {
         localStorage.clear();
     }
 
+    // TODO: error handling when login
     if (localStorage.getItem("userId")) {
         return (
-            <div>
-                <Button onClick={handleLogout}>Logout</Button>
+            <div className={styles.logoutBox}>
+                <div className={styles.logoutForm}>
+                    <h1>You are logged in as {localStorage.getItem("userId")}</h1>
+                    <Button onClick={handleLogout}>Logout</Button>
+                </div>
+                
             </div>
         )
     }

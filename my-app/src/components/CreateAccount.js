@@ -22,11 +22,9 @@ function CreateAccount() {
         setPasswordConfirmationInput(val.target.value);
     }
 
-    // TODO: correct exception handling and prompts
     const handleCreateAccountButton = () => {
         if (passwordInput === passwordConfirmationInput && usernameInput.length > 0 && passwordInput.length > 0) {
-            console.log(dispatch(addUserAsync({username: usernameInput, password: passwordInput})));
-            alert("user created");
+            dispatch(addUserAsync({username: usernameInput, password: passwordInput}));
         }
         else {
             alert("Username and passwords empty or passwords don't match");
