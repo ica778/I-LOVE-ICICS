@@ -5,10 +5,15 @@ const NavBar = () => {
   return (
     <>
       <NavStyle>
-        <NavLogo to="/main">Language Helper</NavLogo>
+        <NavLogo to='/main'>
+          Cypress
+        </NavLogo>
         <NavBars />
         <NavMenu>
-          <NavLink to="/main" activestyle="true">
+		  <NavLink to='/browse' activestyle="true">
+            Browse
+          </NavLink>
+          <NavLink to='/main' activestyle="true">
             Home
           </NavLink>
           <NavLink to="/explore" activestyle="true">
