@@ -1,17 +1,25 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
-const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-const cors = require('cors');
+require("dotenv").config(); 
+var express = require('express');
+var path = require('path');
+const mongoose = require("mongoose");
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+const { Schema } = mongoose;
+var cors = require('cors');
+
+var app = express();
+app.use(cors());
 
 const indexRouter = require('./routes/index');
 const sentenceRouter = require('./routes/sentence');
 const userRouter = require('./routes/user');
 const commentRouter = require('./routes/comment');
 
-const app = express();
+var indexRouter = require('./routes/index');
+var sentenceRouter = require('./routes/sentence');
+var userRouter = require('./routes/user');
+var commentRouter = require('./routes/comment');
+
 
 app.use(cors());
 app.use(logger('dev'));

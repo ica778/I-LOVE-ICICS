@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import {useSelector, useDispatch} from 'react-redux';
 import { updateCurrentSearchText } from "../actions";
+import { Divider } from "@mui/material";
 
 function Searchbar() {
 	let searchResults = useSelector(function(state) {
@@ -14,6 +15,8 @@ function Searchbar() {
 	const dispatch = useDispatch();
 
 	const [search, setSearch] = useState(searchResults);
+	const [importantPart, setImportantPart] = useState('');
+
 	const CssTextField = withStyles({
 		root: {
 		  '& label.Mui-focused': {
@@ -37,8 +40,16 @@ function Searchbar() {
 	  })(TextField);
 
 	const handleTextChange = (e) => {
-		setSearch(e.target.value);
-		dispatch(updateCurrentSearchText(e.target.value))
+		if (e.target.id === 'searchKeyword') {
+			setSearch(e.target.value);
+			dispatch(updateCurrentSearchText(e.target.value))
+		} else {
+			setImportantPart(e.target.value);
+		}
+	}
+
+	const handleSearch = () => {
+		// need to send importantpart joined by '/' to server
 	}
 
 	return (
@@ -46,6 +57,12 @@ function Searchbar() {
 			<CardContent style={{width: '100%', display: 'block', textAlign: 'center', justifyContent: 'center'}}>
 				<Typography style={{marginBottom: '10px'}}>Search a Keyword</Typography>
 				<TextField style={{maxWidth: '90%', minWidth: '90%'}} id="searchKeyword" label="Search a phrase or keyword..." variant="outlined" value={search} onChange={handleTextChange}/>
+				
+				<Typography style={{marginBottom: '10px'}}>Search an Important Part </Typography>
+				<TextField style={{maxWidth: '90%', minWidth: '90%'}} id="searchImportantPart" label="Search a phrase or keyword... (OPTIONAL)" variant="outlined" value={importantPart} onChange={handleTextChange}/>
+				<br/>
+				<br/>
+				<Button style={{ color: 'lavender', background: '#01326c' }} onClick={handleSearch}> Submit </Button>
 			</CardContent>
 		</Card>
 	)
