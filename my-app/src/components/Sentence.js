@@ -8,10 +8,12 @@ import {
   eraseCurrentComment,
 } from '../actions/index';
 import { useSelector, useDispatch } from 'react-redux';
+import { useQuery } from 'react-query';
+import { getCommentsQuery } from '../queries/sentence';
 import styles from './Sentence.module.scss';
 
 const Sentence = props => {
-  const { sentenceBoxId, sentence, noComments } = props;
+  const { sentenceBoxId, sentence, comments } = props;
   const [commentSectionOpen, setCommentSectionOpen] = useState(false);
   const [currentCommentText, setCurrentCommentText] = useState('');
   const dispatch = useDispatch();
@@ -21,6 +23,7 @@ const Sentence = props => {
   });
 
   useEffect(() => {
+    console.log({ props });
     console.log(currentComments);
     if (currentComments && sentenceBoxId in currentComments) {
       setCommentSectionOpen(true);
@@ -61,7 +64,7 @@ const Sentence = props => {
             <CardContent
               style={{
                 maxHeight: '200px',
-                overflow: 'scroll',
+                overflow: 'auto',
               }}
             >
               {sentence}
@@ -79,12 +82,19 @@ const Sentence = props => {
               }}
             >
               {' '}
-              +{noComments} Comment{' '}
+              +{comments.length} Comment{' '}
             </Button>
           </div>
         </Card>
         {commentSectionOpen && (
           <Card style={{ marginTop: '10px', marginBottom: '20px' }}>
+            <CardContent className={styles.grid}>
+              {comments.map(comment => (
+                <Card key={comment._id} className={styles.card}>
+                  {comment.submittedBy} : {comment.text}
+                </Card>
+              ))}
+            </CardContent>
             <CardContent>
               <TextField
                 id="standard-multiline-flexible"

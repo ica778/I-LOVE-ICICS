@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const comment = require('../models/comment');
-const { subcomment } = require('../models/subcomment');
+const Sentence = require('../models/sentence');
 
 router.get('/', async (_, res) => {
   try {
@@ -31,23 +31,30 @@ router.post('/', async (req, res) => {
   try {
     const { text, submittedBy, sentenceId, commentId } = req.body;
     if (commentId) {
-      const _comment = await comment.findById(commentId);
-      if (!_comment)
-        return res.status(404).json({ message: 'No comment found.' });
-      const sub = new subcomment({
+      const parentComment = await comment.findById(commentId);
+      if (!parentComment)
+        return res.status(404).json({ message: 'No parent comment found.' });
+
+      const newComment = await comment.create({
         text,
         submittedBy,
       });
-      _comment.responses.push(sub);
 
-      const data = await _comment.save();
-      res.status(201).json({ data });
+      parentComment.responses.push(newComment._id);
+      await parentComment.save();
+
+      res.status(201).json(newComment);
     } else {
+      const sentence = await Sentence.findById(sentenceId);
+      if (!sentence)
+        return res.status(404).json({ message: 'No sentence found.' });
       const data = await comment.create({
         text,
         submittedBy,
         sentenceId,
       });
+      sentence.comments.push(data._id);
+      await sentence.save();
       return res.status(201).json({ data });
     }
   } catch (err) {

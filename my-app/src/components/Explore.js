@@ -6,7 +6,6 @@ import {
   MenuItem,
   Modal,
   Box,
-  Typography,
 } from '@material-ui/core';
 import { useQuery } from 'react-query';
 import { getSentencesQuery } from '../queries/sentence';
@@ -18,26 +17,30 @@ const modalStyle = {
   top: '40%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  height: '50%',
+  height: 'minmax(auto, 50%)',
   width: '90%',
   bgcolor: '#282828',
   color: 'lavender',
-  border: '4px solid lavender',
+  border: '2px solid lavender',
   boxShadow: 24,
   p: 4,
-  overflow: 'scroll',
+  overflow: 'auto',
 };
 
 function Explore() {
   const [selectedSentence, setSelectedSentence] = useState(null);
   const [sort, setSort] = useState(30);
-  const { data } = useQuery('sentences', getSentencesQuery, {
-    onError: err => {
-      console.error(err);
-    },
-    onSuccess: console.log,
-  });
-  console.log({ data });
+  const { data } = useQuery(
+    'sentences',
+    getSentencesQuery(['submittedBy', 'text', 'responses']),
+    {
+      onError: err => {
+        console.error(err);
+      },
+      onSuccess: console.log,
+    }
+  );
+
   return (
     <div>
       <h1>Explore</h1>
@@ -62,11 +65,13 @@ function Explore() {
         onClose={() => setSelectedSentence(null)}
       >
         <Box sx={modalStyle}>
-          <Sentence
-            sentenceBoxId={selectedSentence?._id}
-            sentence={selectedSentence?.text}
-            noComments={selectedSentence?.comments?.length}
-          />
+          {selectedSentence ? (
+            <Sentence
+              sentenceBoxId={selectedSentence._id}
+              sentence={selectedSentence.text}
+              comments={selectedSentence.comments}
+            />
+          ) : null}
         </Box>
       </Modal>
 

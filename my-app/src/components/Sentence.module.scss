@@ -19,3 +19,25 @@
     border: 2px solid orange;
   }
 }
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  display: grid;
+  grid-auto-rows: minmax(40px, auto);
+  grid-gap: 2em;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.card {
+  background-color: white;
+  color: #282828;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 0.25px solid #282828;
+  padding: 1em;
+  transition: border 0.2s;
+  max-height: 200px;
+}
