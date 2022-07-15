@@ -1,4 +1,4 @@
-const { model, Schema } = require("mongoose");
+const { model, Schema } = require('mongoose');
 
 const sentenceSchema = new Schema(
   {
@@ -8,8 +8,8 @@ const sentenceSchema = new Schema(
     posString: [{ type: String }],
     comments: [
       {
-        // for storing comment ids
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
       },
     ],
   },
@@ -18,4 +18,4 @@ const sentenceSchema = new Schema(
 sentenceSchema.index({ createdAt: 1 });
 sentenceSchema.index({ usefulnessRating: 1 });
 
-module.exports = model("Sentence", sentenceSchema);
+module.exports = model('Sentence', sentenceSchema);

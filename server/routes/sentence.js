@@ -9,24 +9,27 @@ var nlp = require('compromise');
 /* GET sentence listing. */
 router.get('/', async function (req, res, next) {
   try {
-    const data = await Sentence.find();
+    let populate;
+    if (req.query.populate) populate = req.query.populate?.split(',');
+    const data = populate?.length
+      ? await Sentence.find().populate('comments', populate.join(' '))
+      : await Sentence.find();
     res.json(data);
-    // let doc = nlp(`The quick brown fox is not actually brown LOL but i saw it yesterday`);
-    // doc.compute('penn');
-    // let json = doc.json()[0].terms;
-    // let a = json.map(term => [ term.text, term.penn] );
-    // console.log(a);
-    // var words = new pos.Lexer().lex('The quick brown fox is not actually brown LOL but i saw it yesterday');
-    // var tagger = new pos.Tagger();
-    // var taggedWords = tagger.tag(words);
-    // for (i in taggedWords) {
-    // 	var taggedWord = taggedWords[i];
-    // 	var word = taggedWord[0];
-    // 	var tag = taggedWord[1];
-    // 	console.log(word + " /" + tag);
-    // }
   } catch (err) {
+    console.log({ err });
     res.status(500).send(err);
+  }
+});
+
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const sentence = await Sentence.findById(req.params.id);
+    if (!sentence) return res.json({ message: 'No sentence found.' });
+    await sentence.populate('comments', 'submittedBy text');
+    res.json(sentence.comments);
+  } catch (err) {
+    console.error({ err });
+    res.status(500).json(err);
   }
 });
 
