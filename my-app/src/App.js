@@ -5,7 +5,9 @@ import NavBar from './components/Navbar/NavBar';
 import MainPage from './components/MainPage';
 import LoginCredentials from './components/LoginCredentials';
 import CreateAccount from './components/CreateAccount';
-import UserProfile from './components/UserProfile'
+import UserProfile from './components/UserProfile';
+import EditAccount from './components/EditAccount';
+import SearchUsers from './components/SearchUsers';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path='/main' exact element={<MainPage />} />
         <Route path='/user_profile' exact element={<UserProfile />} />
         <Route path='/create_account' exact element={<CreateAccount />} />
+        <Route path='/edit_account' exact element={<EditAccount />} />
+        <Route path='/search_users' exact element={<SearchUsers />} />
       </Routes>
     </Router>
   );

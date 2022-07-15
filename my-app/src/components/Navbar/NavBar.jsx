@@ -22,6 +22,12 @@ const NavBar = () => {
           <NavLink to='/create_account' activestyle="true">
             Create Account
           </NavLink>
+          <NavLink to='/edit_account' activestyle="true">
+            Edit Account
+          </NavLink>
+          <NavLink to='/search_users' activestyle="true">
+            Search Users
+          </NavLink>
         </NavMenu>
       </NavStyle>
     </>
