@@ -12,6 +12,28 @@ const userRouter = require('./routes/user');
 const commentRouter = require('./routes/comment');
 
 var app = express();
+
+mongoose.connect(
+    "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongodb.net/?retryWrites=true&w=majority", 
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(() => {
+		app.listen(3001, () => {
+			'app listening on port 3001'
+		});
+	}).catch((err) => {
+	console.log("encountered an ERROR!!!!");
+	console.log(err);
+});
+
+const connection = mongoose.connection;
+connection.once('open', () => {
+    console.log("MongoDB connection successful");
+});
+
+var app = express();
+
 app.use(cors());
 app.use(logger('dev'));
 
@@ -25,16 +47,3 @@ app.use('/sentence', sentenceRouter);
 app.use('/user', userRouter);
 app.use('/comment', commentRouter);
 
-mongoose.connect(
-    "mongodb://127.0.0.1:27017/language_project", 
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }).then(() => {
-		app.listen(3001, () => {
-			'app listening on port 3001'
-		});
-	}).catch((err) => {
-	console.log("encountered an ERROR!!!!");
-	console.log(err);
-});
