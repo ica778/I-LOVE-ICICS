@@ -26,6 +26,7 @@ function SearchResults(props) {
               id={searchResult._id}
               text={searchResult.text}
               comments={searchResult.comments}
+			  highlightedPart={searchResult.highlightedPart}
             />
           </li>
         );

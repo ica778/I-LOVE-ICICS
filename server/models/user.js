@@ -6,8 +6,23 @@ module.exports = mongoose.model(
   new Schema({
     username: String,
     hash: String,
-    submittedSentences: [{ String }],
-    savedSentences: [{ String }],
-    comments: [{ String }],
+	submittedSentences: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Sentence'
+		}
+	],
+    savedSentences: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Sentence'
+		}
+	],
+    comments: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Comment'
+		}
+	]
   })
 );

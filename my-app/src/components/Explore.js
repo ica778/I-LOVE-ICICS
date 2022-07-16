@@ -111,8 +111,8 @@ function Explore() {
         <Box sx={modalStyle}>
           {selectedSentence ? (
             <Sentence
-              sentenceBoxId={selectedSentence._id}
-              sentence={selectedSentence.text}
+              id={selectedSentence._id}
+              text={selectedSentence.text}
               comments={selectedSentence.comments}
             />
           ) : null}
