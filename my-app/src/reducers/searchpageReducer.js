@@ -1,7 +1,7 @@
 let searchResults = [
   {
-    sentenceBoxId: 1,
-    sentenceText: 'This is a sentence.',
+    _id: 1,
+    text: 'This is a sentence.',
     comments: [
       {
         _id: '62d1c76430fb46821ea49032',
@@ -12,8 +12,8 @@ let searchResults = [
     ],
   },
   {
-    sentenceBoxId: 2,
-    sentenceText: 'The quick brown fox jumps over the lazy dog.',
+    _id: 2,
+    text: 'The quick brown fox jumps over the lazy dog.',
     comments: [
       {
         _id: '62d1c76430fb46821ea49032',
@@ -24,8 +24,8 @@ let searchResults = [
     ],
   },
   {
-    sentenceBoxId: 3,
-    sentenceText:
+    _id: 3,
+    text:
       'The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog.',
     comments: [
       {
@@ -51,6 +51,14 @@ const searchpageReducer = (
           searchText: action.payload,
         },
       };
+	case 'UPDATE_CURRENT_SEARCH_RESULTS':
+		return {
+			...state,
+			currentSearch: {
+				...state.currentSearch,
+				results: action.payload
+			}
+		}
     default:
       return state;
   }
