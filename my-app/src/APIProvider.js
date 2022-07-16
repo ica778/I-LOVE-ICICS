@@ -1,25 +1,14 @@
 import axios from 'axios';
 import { baseUrl } from './config';
 
-export const createNewSentence = async (text, highlightedParts, source) => {
-	console.log(highlightedParts)
+export const createNewSentence = async (text, highlightedPart, source) => {
 	let userId = localStorage.getItem("userId");
 
 	let res = await axios.post(baseUrl + '/sentence', {
-		text, highlightedParts, source
+		text, highlightedPart, source
 	});
 
-	return res;
-}
-
-export const fetchBrowsingPage = async(orderKey, sentenceId) => {
-	let res = await axios.get(baseUrl + '/sentence', {
-		params: {
-			orderKey,
-			id: sentenceId
-		}
-	})
-	return res;
+	return res.data;
 }
 
 export const searchKeywords = async (search, highlightedPart) => {
@@ -28,4 +17,14 @@ export const searchKeywords = async (search, highlightedPart) => {
 			search, highlightedPart
 		}
 	})
+}
+
+export const getSentencesQuery = (populate, orderKey, timeFilterKey, sentenceId) => async () => {
+	let res = await axios.get(baseUrl + '/sentence/recent50', {
+		params: {
+			populate, orderKey, timeFilterKey, sentenceId
+		}
+	})
+	console.log(res.data);
+	return res.data;
 }

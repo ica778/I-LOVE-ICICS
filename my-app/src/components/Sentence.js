@@ -11,9 +11,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useQuery } from 'react-query';
 import { getCommentsQuery } from '../queries/sentence';
 import styles from './Sentence.module.scss';
+import { baseUrl } from '../config';
+import axios from 'axios';
 
 const Sentence = props => {
-  const { sentenceBoxId, sentence, comments } = props;
+  const { id, text, comments } = props;
   const [commentSectionOpen, setCommentSectionOpen] = useState(false);
   const [currentCommentText, setCurrentCommentText] = useState('');
   const dispatch = useDispatch();
@@ -25,9 +27,9 @@ const Sentence = props => {
   useEffect(() => {
     console.log({ props });
     console.log(currentComments);
-    if (currentComments && sentenceBoxId in currentComments) {
+    if (currentComments && id in currentComments) {
       setCommentSectionOpen(true);
-      setCurrentCommentText(currentComments[sentenceBoxId]);
+      setCurrentCommentText(currentComments[id]);
     }
   }, []);
 
@@ -39,16 +41,22 @@ const Sentence = props => {
   const handleCommentText = e => {
     setCurrentCommentText(e.target.value);
     dispatch(
-      updateCurrentComments({ sentenceBoxId, commentText: e.target.value })
+      updateCurrentComments({ id, commentText: e.target.value })
     );
   };
 
   const handleCloseCommentSection = () => {
     setCommentSectionOpen(false);
     setCurrentCommentText('');
-    console.log(sentenceBoxId);
-    dispatch(eraseCurrentComment(sentenceBoxId));
+    console.log(id);
+    dispatch(eraseCurrentComment(id));
   };
+
+  const handleSubmitComment = () => {
+	// const res = await axios.post(baseUrl + '/comment', {
+	// 	text: currentCommentText,
+	// })
+  }
 
   return (
     <div className={styles.outer}>
@@ -67,7 +75,7 @@ const Sentence = props => {
                 overflow: 'auto',
               }}
             >
-              {sentence}
+              {text}
             </CardContent>
 
             <Button
@@ -109,7 +117,7 @@ const Sentence = props => {
               />
             </CardContent>
             <CardActions>
-              <Button>Submit</Button>
+              <Button onClick={handleSubmitComment}>Submit</Button>
               <Button onClick={handleCloseCommentSection}>Cancel</Button>
             </CardActions>
           </Card>

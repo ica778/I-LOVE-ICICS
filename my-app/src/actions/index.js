@@ -10,12 +10,12 @@ export const updateCurrentComments = commentData => {
     }
 }
 
-export const eraseCurrentComment = sentenceBoxId => {
+export const eraseCurrentComment = id => {
     // sentenceBoxId:
     // 1234
     return {
         type: 'ERASE_COMMENT',
-        payload: sentenceBoxId
+        payload: id
     }
 }
 
@@ -34,5 +34,12 @@ export const updateCurrentSearchText = searchData => {
     return {
         type: 'UPDATE_CURRENT_SEARCH_TEXT',
         payload: searchData
+    }
+}
+
+export const updateCurrentSearchResults = results => {
+    return {
+        type: 'UPDATE_CURRENT_SEARCH_RESULTS',
+        payload: results
     }
 }

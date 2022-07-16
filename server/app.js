@@ -6,23 +6,15 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { Schema } = mongoose;
 var cors = require('cors');
-
-var app = express();
-app.use(cors());
-
 const indexRouter = require('./routes/index');
 const sentenceRouter = require('./routes/sentence');
 const userRouter = require('./routes/user');
 const commentRouter = require('./routes/comment');
 
-var indexRouter = require('./routes/index');
-var sentenceRouter = require('./routes/sentence');
-var userRouter = require('./routes/user');
-var commentRouter = require('./routes/comment');
-
-
+var app = express();
 app.use(cors());
 app.use(logger('dev'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -33,15 +25,16 @@ app.use('/sentence', sentenceRouter);
 app.use('/user', userRouter);
 app.use('/comment', commentRouter);
 
-mongoose
-  .connect(process.env.DB_URL)
-  .then(() => {
-    const port = process.env.PORT ?? 8080;
-    app.listen(port, () => {
-      console.log(`LISTENING on :${port}`);
-    });
-  })
-  .catch(err => {
-    console.log('encountered an ERROR!!!!');
-    console.log(err);
-  });
+mongoose.connect(
+    "mongodb://127.0.0.1:27017/language_project", 
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(() => {
+		app.listen(3001, () => {
+			'app listening on port 3001'
+		});
+	}).catch((err) => {
+	console.log("encountered an ERROR!!!!");
+	console.log(err);
+});

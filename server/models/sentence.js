@@ -6,6 +6,8 @@ const sentenceSchema = new Schema(
     usefulnessRating: Number,
     source: String,
     posString: [{ type: String }],
+	viewCount: Number,
+	highlightedPart: String,
     comments: [
       {
         type: Schema.Types.ObjectId,

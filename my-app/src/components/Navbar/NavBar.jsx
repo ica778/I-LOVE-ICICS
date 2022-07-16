@@ -10,14 +10,11 @@ const NavBar = () => {
         </NavLogo>
         <NavBars />
         <NavMenu>
-		  <NavLink to='/browse' activestyle="true">
-            Browse
+		  <NavLink to='/explore' activestyle="true">
+            Explore
           </NavLink>
           <NavLink to='/main' activestyle="true">
-            Home
-          </NavLink>
-          <NavLink to="/explore" activestyle="true">
-            Explore
+            Search
           </NavLink>
           <NavLink to="/user_profile" activestyle="true">
             User Profile

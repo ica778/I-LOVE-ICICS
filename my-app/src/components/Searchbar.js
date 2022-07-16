@@ -4,8 +4,10 @@ import { Card, CardContent, Typography, CardActions } from '@material-ui/core';
 import { useState } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import {useSelector, useDispatch} from 'react-redux';
-import { updateCurrentSearchText } from "../actions";
+import { updateCurrentSearchResults, updateCurrentSearchText } from "../actions";
 import { Divider } from "@mui/material";
+import { baseUrl } from '../config';
+import axios from "axios";
 
 function Searchbar() {
 	let searchResults = useSelector(function(state) {
@@ -15,7 +17,7 @@ function Searchbar() {
 	const dispatch = useDispatch();
 
 	const [search, setSearch] = useState(searchResults);
-	const [importantPart, setImportantPart] = useState('');
+	const [highlightedPart, setHighlightedPart] = useState('');
 
 	const CssTextField = withStyles({
 		root: {
@@ -44,12 +46,20 @@ function Searchbar() {
 			setSearch(e.target.value);
 			dispatch(updateCurrentSearchText(e.target.value))
 		} else {
-			setImportantPart(e.target.value);
+			setHighlightedPart(e.target.value);
 		}
 	}
 
-	const handleSearch = () => {
+	const handleSearch = async () => {
 		// need to send importantpart joined by '/' to server
+		let res = await axios.get(baseUrl + '/sentence/search', {
+			params: {
+				search,
+				highlightedPart
+			}
+		})
+		console.log(res.data);
+		dispatch(updateCurrentSearchResults(res.data));
 	}
 
 	return (
@@ -59,7 +69,7 @@ function Searchbar() {
 				<TextField style={{maxWidth: '90%', minWidth: '90%'}} id="searchKeyword" label="Search a phrase or keyword..." variant="outlined" value={search} onChange={handleTextChange}/>
 				
 				<Typography style={{marginBottom: '10px'}}>Search an Important Part </Typography>
-				<TextField style={{maxWidth: '90%', minWidth: '90%'}} id="searchImportantPart" label="Search a phrase or keyword... (OPTIONAL)" variant="outlined" value={importantPart} onChange={handleTextChange}/>
+				<TextField style={{maxWidth: '90%', minWidth: '90%'}} id="searchHighlightedPart" label="Search a phrase or keyword... (OPTIONAL)" variant="outlined" value={highlightedPart} onChange={handleTextChange}/>
 				<br/>
 				<br/>
 				<Button style={{ color: 'lavender', background: '#01326c' }} onClick={handleSearch}> Submit </Button>

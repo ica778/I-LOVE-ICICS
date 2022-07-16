@@ -19,11 +19,12 @@ function SearchResults(props) {
     return (
       Array.isArray(searchResults) &&
       searchResults.map(searchResult => {
+		console.log(searchResult);
         return (
           <li key={searchResult.sentenceBoxId} style={{ width: '100%' }}>
             <Sentence
-              sentenceBoxId={searchResult.sentenceBoxId}
-              sentence={searchResult.sentenceText}
+              id={searchResult._id}
+              text={searchResult.text}
               comments={searchResult.comments}
             />
           </li>
@@ -40,7 +41,7 @@ function SearchResults(props) {
         display: 'flex',
       }}
     >
-      <ul style={{ listStyleType: 'none' }}>
+      <ul style={{ listStyleType: 'none', width: '100%' }}>
         {renderSentences(searchResults)}
       </ul>
     </div>
