@@ -47,16 +47,16 @@ const userSlice = createSlice({
                 state.getUsersSearchName = REQUEST_STATE.REJECTED;
                 state.error = action.error;
             })
-            .addCase(updateUsernameAsync.pending, (state) => {
-                state.updateUsername = REQUEST_STATE.PENDING;
+            .addCase(updateAccountInformationAsync.pending, (state) => {
+                state.updateAccountInformation = REQUEST_STATE.PENDING;
                 state.error = null;
             })
-            .addCase(updateUsernameAsync.fulfilled, (state, action) => {
-                state.updateUsername = REQUEST_STATE.FULFILLED;
+            .addCase(updateAccountInformationAsync.fulfilled, (state, action) => {
+                state.updateAccountInformation = REQUEST_STATE.FULFILLED;
                 state.list = action.payload;
             })
-            .addCase(updateUsernameAsync.rejected, (state, action) => {
-                state.updateUsername = REQUEST_STATE.REJECTED;
+            .addCase(updateAccountInformationAsync.rejected, (state, action) => {
+                state.updateAccountInformation = REQUEST_STATE.REJECTED;
                 state.error = action.error;
             })
     }

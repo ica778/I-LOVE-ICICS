@@ -23,9 +23,9 @@ export const getUsersSearchName = createAsyncThunk(
     }
 );
 
-export const updateUsernameAsync = createAsyncThunk(
-    actionTypes.UPDATE_USERNAME,
+export const updateAccountInformationAsync = createAsyncThunk(
+    actionTypes.UPDATE_ACCOUNTINFO,
     async (data) => {
-        return await UserService.updateUsername(data);
+        return await UserService.updateAccountInformation(data);
     }
 );

@@ -35,16 +35,14 @@ const addUser = async (credentials) => {
     return data;
 }
 
-const updateUsername = async (data) => {
+const updateAccountInformation = async (data) => {
+    console.log(JSON.stringify(data));
     const response = await fetch('http://localhost:3001/user/update', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            'id': data.id,
-            'username': data.username
-        })
+        body: JSON.stringify(data)
     });
     const responseVal = await response.json();
     if (!response.ok) {
@@ -59,5 +57,5 @@ export default {
     getUserPassword,
     addUser,
     getUsersSearchName,
-    updateUsername
+    updateAccountInformation
 }

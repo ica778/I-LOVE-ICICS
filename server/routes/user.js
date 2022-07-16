@@ -81,9 +81,14 @@ router.post('/login/', async function(req, res, next) {
 // TODO: make update by _id instead of username
 router.put('/update/', async function(req, res, next) {
     try {
-        const user = await User.updateOne({username: req.body.id}, {$set: {username: req.body.username}});
-        console.log(user);
-        return res.send(user);
+        if (req.body.username) {
+            const user = await User.updateOne({username: req.body.id}, {$set: {username: req.body.username}});
+            return res.send(user);
+        }
+        else if (req.body.password) {
+            const user = await User.updateOne({username: req.body.id}, {$set: {password: req.body.password}});
+            return res.send(user);
+        }
     } catch (err) {
         return res.status(500).send(err);
     }

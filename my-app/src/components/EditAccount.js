@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@material-ui/core';
 import styles from './EditAccount.module.scss';
 import { useState } from 'react';
-import { updateUsernameAsync } from '../redux/user/thunks';
+import { updateAccountInformationAsync } from '../redux/user/thunks';
 
 function EditAccount() {
     const dispatch = useDispatch();
@@ -10,10 +10,6 @@ function EditAccount() {
     const [username, setUsername] = useState('');
     function setUsernameInput(val) {
         setUsername(val.target.value);
-    }
-    const [currentPassword, setCurrentPassword] = useState('');
-    function setCurrentPasswordInput(val) {
-        setCurrentPassword(val.target.value);
     }
     const [password, setPassword] = useState('');
     function setPasswordInput(val) {
@@ -29,8 +25,16 @@ function EditAccount() {
     }
 
     function handleEditAccount() {
-        dispatch(updateUsernameAsync({'id': localStorage.getItem('userId'), 'username': username}));
-        localStorage.setItem('userId', username);
+        if (username) {
+            dispatch(updateAccountInformationAsync({id: localStorage.getItem('userId'), username: username}));
+            localStorage.setItem('userId', username);
+            alert("Your new username is: " + username);
+        }
+        if (password && password === passwordRedo) {
+            dispatch(updateAccountInformationAsync({id: localStorage.getItem('userId'), password: password}));
+            alert("Your new password is: " + password);
+        }
+        
     } 
 
     return (
@@ -39,9 +43,8 @@ function EditAccount() {
                 <label>Edit Account</label>
                 <input value={username} onChange={setUsernameInput} placeholder="New Username" size="20"/>
                 <br/>
-                <input value={currentPassword} onChange={setCurrentPasswordInput} placeholder="Enter Current Password" size="20"/>
-                <input value={password} onChange={setPassword} placeholder="Enter New Password" size="20"/>
-                <input value={passwordRedo} onChange={setPasswordRedo} placeholder="Re-Enter New Password" size="20"/>
+                <input value={password} onChange={setPasswordInput} placeholder="Enter New Password" size="20"/>
+                <input value={passwordRedo} onChange={setPasswordRedoInput} placeholder="Re-Enter New Password" size="20"/>
                 <br/>
                 <label>Edit Email</label>
                 <input value={email} onChange={setEmailInput} placeholder="Add Email" size="20"/>
