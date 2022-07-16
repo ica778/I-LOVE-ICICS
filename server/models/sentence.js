@@ -1,7 +1,23 @@
-var mongoose = require('mongoose');
-const {Schema} = mongoose;
-let sentenceSchema = new Schema({text: String, usefulnessRating: Number, source: String, posString: [{type: String}]}, { timestamps: true });
-sentenceSchema.index({"createdAt": 1});
-sentenceSchema.index({"usefulnessRating": 1});
+const { model, Schema } = require('mongoose');
 
-module.exports = mongoose.model("Sentence", sentenceSchema);
+const sentenceSchema = new Schema(
+  {
+    text: String,
+    usefulnessRating: Number,
+    source: String,
+    posString: [{ type: String }],
+	viewCount: Number,
+	highlightedPart: String,
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+      },
+    ],
+  },
+  { timestamps: true }
+);
+sentenceSchema.index({ createdAt: 1 });
+sentenceSchema.index({ usefulnessRating: 1 });
+
+module.exports = model('Sentence', sentenceSchema);
