@@ -35,9 +35,29 @@ const addUser = async (credentials) => {
     return data;
 }
 
+const updateUsername = async (data) => {
+    const response = await fetch('http://localhost:3001/user/update', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'id': data.id,
+            'username': data.username
+        })
+    });
+    const responseVal = await response.json();
+    if (!response.ok) {
+        const errorMsg = data?.message;
+        throw new Error(errorMsg)
+    }
+    return responseVal;
+}
+
 export default {
     getUsers,
     getUserPassword,
     addUser,
-    getUsersSearchName
+    getUsersSearchName,
+    updateUsername
 }

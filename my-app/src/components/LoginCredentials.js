@@ -20,12 +20,15 @@ function LoginCredentials() {
         setPasswordInput(val.target.value);
     }
 
+    //TODO: verify if naming of variables userId and _id is good idea
     const handleLogin = () => {
         dispatch(getUsersAsync()).then(value => {
             let found = value.payload.find(element => element.username === usernameInput && element.password === passwordInput);
             if (found !== null) {
                 setUserId(found.username);
                 localStorage.setItem('userId', found.username);
+                localStorage.setItem('_id', found._id);
+                console.log(localStorage.getItem('_id'));
             }
         });
     }

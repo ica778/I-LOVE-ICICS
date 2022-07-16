@@ -18,6 +18,7 @@ router.get('/', async function(req, res, next) {
 });
 
 // search users
+// INPUT: :id = username
 router.get('/:id', async function(req, res, next) {
 	try {
         let ret = [];
@@ -72,6 +73,17 @@ router.post('/login/', async function(req, res, next) {
                 }
             })
         })
+    } catch (err) {
+        return res.status(500).send(err);
+    }
+})
+
+// TODO: make update by _id instead of username
+router.put('/update/', async function(req, res, next) {
+    try {
+        const user = await User.updateOne({username: req.body.id}, {$set: {username: req.body.username}});
+        console.log(user);
+        return res.send(user);
     } catch (err) {
         return res.status(500).send(err);
     }
