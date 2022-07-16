@@ -13,11 +13,14 @@ import { getCommentsQuery } from '../queries/sentence';
 import styles from './Sentence.module.scss';
 import { baseUrl } from '../config';
 import axios from 'axios';
+import Highlightable from 'react-highlight';
 
 const Sentence = props => {
-  const { id, text, comments } = props;
+  let { id, text, comments, highlightedPart } = props;
   const [commentSectionOpen, setCommentSectionOpen] = useState(false);
   const [currentCommentText, setCurrentCommentText] = useState('');
+  const [currentCommentsSentence, setCurrentCommentsSentence] = useState(comments);
+
   const dispatch = useDispatch();
 
   let currentComments = useSelector(function (state) {
@@ -33,8 +36,11 @@ const Sentence = props => {
     }
   }, []);
 
-  const handleCommentOpenButton = () => {
+  const handleCommentOpenButton = async () => {
     console.log('Hi');
+	let res = await axios.get(baseUrl + `/sentence/${id}/comments`);
+	console.log(res.data);
+	setCurrentCommentsSentence(res.data);
     setCommentSectionOpen(true);
   };
 
@@ -52,10 +58,21 @@ const Sentence = props => {
     dispatch(eraseCurrentComment(id));
   };
 
-  const handleSubmitComment = () => {
-	// const res = await axios.post(baseUrl + '/comment', {
-	// 	text: currentCommentText,
-	// })
+  const handleSubmitComment = async () => {
+	console.log('sub mitting comment')
+	try {
+		const res = await axios.post(baseUrl + '/comment', {
+			text: currentCommentText,
+			submittedBy: localStorage.getItem('userId'),
+			sentenceId: id
+		});
+		const comment = res.data;
+		setCurrentCommentsSentence([...currentCommentsSentence, comment.data ]);
+		setCurrentCommentText('');
+		console.log(comment);
+	} catch (err) {
+		console.log(err);
+	}
   }
 
   return (
@@ -90,18 +107,19 @@ const Sentence = props => {
               }}
             >
               {' '}
-              +{comments.length} Comment{' '}
+              +{currentCommentsSentence.length} Comment{' '}
             </Button>
           </div>
         </Card>
         {commentSectionOpen && (
           <Card style={{ marginTop: '10px', marginBottom: '20px' }}>
             <CardContent className={styles.grid}>
-              {comments.map(comment => (
-                <Card key={comment._id} className={styles.card}>
+              {currentCommentsSentence.map(comment => {
+				console.log(comment);
+                return <Card key={comment._id} className={styles.card}>
                   {comment.submittedBy} : {comment.text}
                 </Card>
-              ))}
+				})}
             </CardContent>
             <CardContent>
               <TextField

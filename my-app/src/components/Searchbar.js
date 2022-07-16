@@ -59,6 +59,9 @@ function Searchbar() {
 			}
 		})
 		console.log(res.data);
+		await axios.put(baseUrl + '/sentence/viewcount', {
+			ids: res.data
+		})
 		dispatch(updateCurrentSearchResults(res.data));
 	}
 
