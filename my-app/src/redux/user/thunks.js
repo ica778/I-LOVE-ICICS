@@ -15,3 +15,10 @@ export const addUserAsync = createAsyncThunk(
         return await UserService.addUser(credentials);
     }
 );
+
+export const getUsersSearchName = createAsyncThunk(
+    actionTypes.SEARCH_USERS,
+    async (userString) => {
+        return await UserService.getUsersSearchName(userString);
+    }
+);

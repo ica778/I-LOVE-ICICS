@@ -17,6 +17,21 @@ router.get('/', async function(req, res, next) {
 	}
 });
 
+// search users
+router.get('/:id', async function(req, res, next) {
+	try {
+        let ret = [];
+		const users = await User.find({"username":{$regex:req.params.id}});
+        for (let o of users) {
+            ret.push({_id: o._id, username: o.username, password: o.password});
+        }
+        console.log(JSON.stringify(ret));
+        return res.send(ret);
+	} catch (err) {
+		return res.status(500).send(err);
+	}
+});
+
 router.post('/create/', async function(req, res, next) {
     try {
         let username = req.body.username;

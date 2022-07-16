@@ -5,6 +5,13 @@ const getUsers = async (userId) => {
     return response.json();
 }
 
+const getUsersSearchName = async (userString) => {
+    const response = await fetch('http://localhost:3001/user/' + userString, {
+        method: 'GET'
+    });
+    return response.json();
+}
+
 const getUserPassword = async (userId) => {
     const response = await fetch('http://localhost:3001/user', {
         method: 'GET'
@@ -31,5 +38,6 @@ const addUser = async (credentials) => {
 export default {
     getUsers,
     getUserPassword,
-    addUser
+    addUser,
+    getUsersSearchName
 }

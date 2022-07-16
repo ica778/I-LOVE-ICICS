@@ -35,6 +35,18 @@ const userSlice = createSlice({
                 state.addUser = REQUEST_STATE.REJECTED;
                 state.error = action.error;
             })
+            .addCase(getUsersSearchNameAsync.pending, (state) => {
+                state.getUsersSearchName = REQUEST_STATE.PENDING;
+                state.error = null;
+            })
+            .addCase(getUsersSearchNameAsync.fulfilled, (state, action) => {
+                state.getUsersSearchName = REQUEST_STATE.FULFILLED;
+                state.list = action.payload;
+            })
+            .addCase(getUsersSearchNameAsync.rejected, (state, action) => {
+                state.getUsersSearchName = REQUEST_STATE.REJECTED;
+                state.error = action.error;
+            })
     }
 });
 
