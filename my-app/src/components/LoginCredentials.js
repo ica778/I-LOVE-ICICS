@@ -24,16 +24,37 @@ function LoginCredentials() {
         setPasswordInput(val.target.value);
     }
 
+    /*
+    //TODO: verify if naming of variables userId and _id is good idea
+    const handleLogin = () => {
+        dispatch(getUsersAsync()).then(value => {
+            let found = value.payload.find(element => element.username === usernameInput && element.password === passwordInput);
+            if (found !== null) {
+                setUserId(found.username);
+                localStorage.setItem('userId', found.username);
+                localStorage.setItem('_id', found._id);
+                console.log(localStorage.getItem('_id'));
+            }
+        });
+        */
     const handleLogin = async () => {
 		try {
+            /*
 			let resp = await axios.post(baseUrl + '/user/login/', {
 				username: usernameInput,
 				password: passwordInput
 			});
 			let userId = resp.data;
 			console.log(userId);
-
-			localStorage.setItem('userId', userId);
+            */
+            dispatch(getUsersAsync()).then(value => {
+                let found = value.payload.find(element => element.username === usernameInput && element.password === passwordInput);
+                if (found !== null) {
+                    setUserId(found.username);
+                    localStorage.setItem('userId', found.username);
+                    localStorage.setItem('_id', found._id);
+                }
+            });
 			setUsernameInput('');
 			setPasswordInput('');
 			toast.success('Successfully logged in.', {
@@ -66,17 +87,17 @@ function LoginCredentials() {
     }
 
     // // TODO: error handling when login
-    // if (localStorage.getItem("userId")) {
-    //     return (
-    //         <div className={styles.logoutBox}>
-    //             <div className={styles.logoutForm}>
-    //                 <h1>You are logged in as {localStorage.getItem("userId")}</h1>
-    //                 <Button onClick={handleLogout}>Logout</Button>
-    //             </div>
+    if (localStorage.getItem("userId")) {
+        return (
+            <div className={styles.logoutBox}>
+                <div className={styles.logoutForm}>
+                    <h1>You are logged in as {localStorage.getItem("userId")}</h1>
+                     <Button onClick={handleLogout}>Logout</Button>
+                 </div>
                 
-    //         </div>
-    //     )
-    // }
+             </div>
+         )
+     }
 
     return (
         <div className={styles.loginBox}>
