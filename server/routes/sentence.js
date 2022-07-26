@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const Sentence = require('../models/sentence');
 const Comment = require('../models/comment');
+const User = require('../models/user');
 const moment = require('moment');
 var pos = require('pos');
 var nlp = require('compromise');
@@ -31,7 +32,7 @@ router.get('/test', function (req, res, next) {
 router.get('/:id/comments', async (req, res) => {
   try {
     const sentence = await Sentence.findById(req.params.id);
-    if (!sentence) return res.json({ message: 'No sentence found.' });
+    if (!sentence) return res.status(500).send('Sentence does not exist');
     await sentence.populate('comments', 'submittedBy text');
     res.json(sentence.comments);
   } catch (err) {
@@ -84,7 +85,7 @@ router.get('/recent50/', async function(req, res, next) {
 		let sentences = await Sentence.aggregate(aggregateArr);
 		console.log(sentences);
 		
-		await Comment.populate(sentences, {path: populate}, () => {});
+		await Comment.populate(sentences, 'text', () => {});
 		return res.send(sentences);
 	} catch (err) {
 		console.log(err);
@@ -249,6 +250,7 @@ router.get('/search', async function (req, res, next) {
 router.post('/', async function(req, res, next) {
 	try {
 		let text = req.body.text.trim();
+		let userId = req.headers.userId;
 		let source = req.body.source ? req.body.source.trim() : '';
 		let highlightedPart = req.body.highlightedPart ? req.body.highlightedPart : '';
 		let posString = [];
@@ -263,12 +265,46 @@ router.post('/', async function(req, res, next) {
 		console.log(highlightedPart);
 		let sentence = new Sentence({text: text, usefulnessRating: 0, viewCount: 0, highlightedPart: highlightedPart, source: source, posString: posString, comments: []});
 		let sentenceSaved = await sentence.save();
-		return res.send(sentenceSaved);
+
+		User.findByIdAndUpdate(userId,
+			{
+				$push: { submittedSentences: sentence._id}
+			}, function (err, result) {
+				if (err) {
+					return res.status(500).send(err);
+				} else {
+					console.log(result);
+					return res.send(result);
+				}
+			});
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
 	}
 });
+
+router.put('/viewcount', async function (req, res, next) {
+	try {
+		let ids = req.body.ids;
+		let sentences = await Sentence.find({
+			'_id': {
+				$in: ids
+			}
+		});
+		console.log('bruh');
+		sentences.forEach(async (sentence) => {
+			console.log('what the fuck');
+			console.log(sentence.viewCount);
+			sentence.viewCount = sentence.viewCount + 1;
+			console.log(sentence.viewCount)
+			await sentence.save();
+		})
+		return res.send('OK');
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send(err);
+	}
+})
 
 router.delete('/', async function (req, res, next) {
   try {

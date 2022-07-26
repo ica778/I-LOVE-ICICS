@@ -33,18 +33,32 @@ router.get('/:id', async function(req, res, next) {
 	}
 });
 
+router.get('/:id/sentences', async function(req, res, next) {
+	try {
+		const user = await User.findById(req.params.id);
+		if (!user) return res.status(500).send('User does not exist.');
+		await (await user.populate('submittedSentences', 'text comments')).populate('savedSentences', 'text comments');
+		return res.send({
+			submittedSentences: user.submittedSentences,
+			savedSentences: user.savedSentences
+		});
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send(err);
+	}
+})
+
 router.post('/create/', async function(req, res, next) {
     try {
         let username = req.body.username;
         let password = req.body.password;
-        // I removed the hashing for password as a shortcut to save time
         bcrypt.hash(password, 10, function(err, hash) {
             User.findOne({username: username}, function(err, obj) {
                 if (obj == null) {
-                    const user = new User({username: username, password: password});
+                    const user = new User({username: username, hash: hash});
                     user.save((err) => {
                         if (err) return res.status(500).send('Error saving user.');
-                        return res.send('User successfully created!');
+                        return res.send(user._id);
                     });
                 } else {
                     return res.status(500).send('This username already exists.');
@@ -61,7 +75,7 @@ router.post('/login/', async function(req, res, next) {
         let username = req.body.username;
         let password = req.body.password;
         User.findOne({username: username}, function(err, obj) {
-            if (obj == null) {
+            if (!obj) {
                 return res.status(500).send('Error with login credentials');
             }
             let hash = obj.hash;
@@ -74,6 +88,7 @@ router.post('/login/', async function(req, res, next) {
             })
         })
     } catch (err) {
+		console.log(err);
         return res.status(500).send(err);
     }
 })

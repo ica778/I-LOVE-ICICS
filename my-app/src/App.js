@@ -16,11 +16,11 @@ function App() {
     <Router>
       <NavBar />
       <Routes>
-        <Route path='/' exact element={<LoginCredentials />} />
-        <Route path='/main' exact element={<MainPage />} />
-        <Route path='/user_profile' exact element={<UserProfile />} />
-		<Route path='/explore' exact element={<Explore/>} />
-        <Route path='/create_account' exact element={<CreateAccount />} />
+        <Route path="/" exact element={<LoginCredentials />} />
+        <Route path="/main" exact element={<MainPage />} />
+        <Route path="/explore" exact element={<Explore />} />
+        <Route path="/user_profile" exact element={<UserProfile />} />
+        <Route path="/create_account" exact element={<CreateAccount />} />
         <Route path='/edit_account' exact element={<EditAccount />} />
         <Route path='/search_users' exact element={<SearchUsers />} />
       </Routes>
