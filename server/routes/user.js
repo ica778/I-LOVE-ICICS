@@ -74,10 +74,12 @@ router.post('/login/', async function(req, res, next) {
     try {
         let username = req.body.username;
         let password = req.body.password;
-        User.findOne({username: username}, function(err, obj) {
+        console.log(username + " | " + password);
+        User.findOne({username: username, password: password}, function(err, obj) {
             if (!obj) {
-                return res.status(500).send('Error with login credentials');
+                return res.status(404).send('User not found');
             }
+            /*
             let hash = obj.hash;
             bcrypt.compare(password, hash, function(err, result) {
                 if (result) {
@@ -86,6 +88,9 @@ router.post('/login/', async function(req, res, next) {
                     return res.status(500).send('Error with login credentials.');
                 }
             })
+            */
+            // temp change to bypass hash for login
+            return res.send(obj._id);
         })
     } catch (err) {
 		console.log(err);
@@ -93,7 +98,7 @@ router.post('/login/', async function(req, res, next) {
     }
 })
 
-// TODO: make update by _id instead of username
+// TODO: make update by _id instead of username, currently use _id because User.updateOne doesn't work with _id
 router.put('/update/', async function(req, res, next) {
     try {
         if (req.body.username) {

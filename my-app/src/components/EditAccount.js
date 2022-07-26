@@ -26,12 +26,12 @@ function EditAccount() {
 
     function handleEditAccount() {
         if (username) {
-            dispatch(updateAccountInformationAsync({id: localStorage.getItem('userId'), username: username}));
-            localStorage.setItem('userId', username);
+            dispatch(updateAccountInformationAsync({id: localStorage.getItem('username'), username: username}));
+            localStorage.setItem('username', username);
             alert("Your new username is: " + username);
         }
         if (password && password === passwordRedo) {
-            dispatch(updateAccountInformationAsync({id: localStorage.getItem('userId'), password: password}));
+            dispatch(updateAccountInformationAsync({id: localStorage.getItem('username'), password: password}));
             alert("Your new password is: " + password);
         }
         

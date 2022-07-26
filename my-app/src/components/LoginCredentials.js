@@ -46,6 +46,7 @@ function LoginCredentials() {
 			console.log(userId);
 
 			localStorage.setItem('userId', userId);
+            localStorage.setItem('username', usernameInput);
 			setUsernameInput('');
 			setPasswordInput('');
 			toast.success('Successfully logged in.', {
@@ -59,8 +60,11 @@ function LoginCredentials() {
 			});
 		} catch (err) {
 			console.log(err);
-			setPasswordInput('')
-			toast.error('Something went wrong with the login. Please try again', {
+            let errorMessage = 'Something went wrong with the login. Please try again';
+            if (err.response.status == 404) {
+                errorMessage = 'User with those credentials not found';
+            }
+			toast.error(errorMessage, {
 				position: "top-right",
 				autoClose: 5000,
 				hideProgressBar: false,
@@ -78,17 +82,17 @@ function LoginCredentials() {
     }
 
     // // TODO: error handling when login
-    // if (localStorage.getItem("userId")) {
-    //     return (
-    //         <div className={styles.logoutBox}>
-    //             <div className={styles.logoutForm}>
-    //                 <h1>You are logged in as {localStorage.getItem("userId")}</h1>
-    //                 <Button onClick={handleLogout}>Logout</Button>
-    //             </div>
+    if (localStorage.getItem("userId")) {
+        return (
+            <div className={styles.logoutBox}>
+                <div className={styles.logoutForm}>
+                    <h1>You are logged in as {localStorage.getItem("username")}</h1>
+                    <Button onClick={handleLogout}>Logout</Button>
+                </div>
                 
-    //         </div>
-    //     )
-    // }
+            </div>
+        )
+    }
 
     return (
         <div className={styles.loginBox}>
