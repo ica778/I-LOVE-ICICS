@@ -1,5 +1,5 @@
 
-.loginBox {
+.formBox {
     position: relative;
     margin: auto;
     display: flex;
@@ -35,21 +35,7 @@ input {
     height: 1.5em;
 }
 
-.logoutBox {
-    position: relative;
-    margin: auto;
-    display: flex;
+.inputBox {
+    display: flexbox;
     flex-direction: column;
-    width: 80%;
-    margin-top: 15em;
-    padding: 1.5em;
-    border: solid;
-    border-width: 2px;
-    border-color: black;
-}
-
-.logoutForm {
-    text-align: center;
-    color: black;
-
 }
