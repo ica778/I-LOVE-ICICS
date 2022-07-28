@@ -26,7 +26,7 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_FRONTEND_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-        endv:
+        env:
           HD_APP_BASE: "my-app"
       - name: Release Backend
         uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
@@ -34,5 +34,5 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_BACKEND_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-        endv:
+        env:
           HD_APP_BASE: "server"
