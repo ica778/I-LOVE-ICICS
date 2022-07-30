@@ -31,9 +31,10 @@ mongoose.connect(
         useNewUrlParser: true,
         useUnifiedTopology: true
     }).then(() => {
-		app.listen(3001, () => {
-			'app listening on port 3001'
-		});
+		app.set('port', (process.env.PORT || 3001));
+		app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
+			console.log("Server is running.");
+		  });
 	}).catch((err) => {
 	console.log("encountered an ERROR!!!!");
 	console.log(err);
