@@ -26,7 +26,8 @@ app.use('/user', userRouter);
 app.use('/comment', commentRouter);
 
 mongoose.connect(
-    "mongodb://127.0.0.1:27017/language_project", 
+    //"mongodb://127.0.0.1:27017/language_project", 
+	"mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongodb.net/?retryWrites=true&w=majority",
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
