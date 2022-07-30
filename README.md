@@ -1,70 +1,41 @@
-# Getting Started with Create React App
+# I-LOVE-ICICS
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Project Description:
+The project will be a language learning application that allows users who are new to the language to search up phrases or words and find examples of how they're used. Whenever we learn a new language, most tools only teach new learners about basic sentence structure and vocabulary however, as language learners ourselves, we found that some problems that we often run into are the coloquialisms, slang, and uses of words or phrases in special circumstances that aren't normally taught by instructors or courses. As such, our aim is to develop a tool for users to both contribute and reap the benefits of being apart of a language learning community to learn the ins and outs that are commonly only known to native speakers. Through our web application, users will be able to search and filter words and phrases and have our search algorithm return not only matching results but also results in other tenses. Additionally, we included the ability for users to have our algorithm fill in blanks with nouns, verbs, and adjectives based on the users needs. Our end product will include a table with instructions on how to efficiently use the filters included with our search algorithm.
 
-## Available Scripts
+Project task requirements:
 
-In the project directory, you can run:
+Minimal requirements: 
+- Account creation page  
+- Login page    
+- User home page with all saved and submitted sentences  
+- Ability to add sentences   
 
-### `npm start`
+Standard requirements:  
+- Login feature    
+- Explore page including drop down with filters 
+- Editing user profile   
+- Ability to comment on sentences
+- Add sentence features     
+- Instructions on how to filter sentences with our search algorithm  
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Stretch requirements:  
+- Ability to highlight parts of sentence to make them "important" in the search 
+- Liking and adding sentences to a user's saved section  
+- Ability to sort explore page by trending in last 24h, week, month
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+Dividing work:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Login Page:  
+- Text boxes to enter information  
+- UI to make it look nice  
+- Log in and create user buttons  
+- Information on what project does  
+- Link to instructions page  
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+User home page:  
+- List of sentences by that user  
+- Create new sentence button  
+- Edit user button  
+- Link to instructions page on how to use the web application 
