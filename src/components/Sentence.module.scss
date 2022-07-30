@@ -1,0 +1,43 @@
+.button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: lavender;
+  width: 20px;
+}
+
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5em;
+  border: 1px solid #181818;
+  margin: 1em;
+  transition: border 0.2s;
+
+  &:hover {
+    border: 2px solid orange;
+  }
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  display: grid;
+  grid-auto-rows: minmax(40px, auto);
+  grid-gap: 2em;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.card {
+  background-color: white;
+  color: #282828;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 0.25px solid #282828;
+  padding: 1em;
+  transition: border 0.2s;
+  max-height: 200px;
+}

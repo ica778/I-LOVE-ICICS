@@ -1,0 +1,36 @@
+
+.formBox {
+    position: relative;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    margin-top: 15em;
+    padding: 1.5em;
+    border: solid;
+    border-width: 2px;
+    border-color: black;
+}
+
+.formControl {
+    display: flex;
+    flex-direction: column;
+    margin-right: 2em;
+}
+
+.controls {
+    width: 40%;
+    margin-top: 0.3em;  
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+}
+
+.formControl label {
+    font-size: large;
+    color: black;
+}
+
+input {
+    height: 1.5em;
+}
