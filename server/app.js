@@ -25,8 +25,7 @@ app.use('/sentence', sentenceRouter);
 app.use('/user', userRouter);
 app.use('/comment', commentRouter);
 
-console.log("TESTING123");
-
+/*
 mongoose.connect(
     "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongodb.net/?retryWrites=true&w=majority", 
     {
@@ -39,4 +38,11 @@ mongoose.connect(
 	}).catch((err) => {
 	console.log("encountered an ERROR!!!!");
 	console.log(err);
+});
+*/
+const uri = 'mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongodb.net/?retryWrites=true&w=majority';
+mongoose.connect(uri);
+const connection = mongoose.connection;
+connection.once('open', () => {
+    console.log("MongoDB connection successful");
 });
