@@ -1,1 +1,1 @@
-export const baseUrl = 'https://i-love-icics-backend.herokuapp.com';
+export const baseUrl = 'http://i-love-icics-backend.herokuapp.com';

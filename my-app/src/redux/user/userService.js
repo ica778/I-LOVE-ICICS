@@ -1,26 +1,26 @@
 const getUsers = async (userId) => {
-    const response = await fetch('https://i-love-icics-backend.herokuapp.com/user', {
+    const response = await fetch('http://i-love-icics-backend.herokuapp.com/user', {
         method: 'GET'
     });
     return response.json();
 }
 
 const getUsersSearchName = async (userString) => {
-    const response = await fetch('https://i-love-icics-backend.herokuapp.com/user' + userString, {
+    const response = await fetch('http://i-love-icics-backend.herokuapp.com/user' + userString, {
         method: 'GET'
     });
     return response.json();
 }
 
 const getUserPassword = async (userId) => {
-    const response = await fetch('https://i-love-icics-backend.herokuapp.com/user', {
+    const response = await fetch('http://i-love-icics-backend.herokuapp.com/user', {
         method: 'GET'
     });
     return response.json();
 }
 
 const addUser = async (credentials) => {
-    const response = await fetch('https://i-love-icics-backend.herokuapp.com/user/create', {
+    const response = await fetch('http://i-love-icics-backend.herokuapp.com/user/create', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ const addUser = async (credentials) => {
 
 const updateAccountInformation = async (data) => {
     console.log(JSON.stringify(data));
-    const response = await fetch('https://i-love-icics-backend.herokuapp.com/user/update', {
+    const response = await fetch('http://i-love-icics-backend.herokuapp.com/user/update', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
