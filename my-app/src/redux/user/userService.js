@@ -6,7 +6,7 @@ const getUsers = async (userId) => {
 }
 
 const getUsersSearchName = async (userString) => {
-    const response = await fetch('https://i-love-icics-backend.herokuapp.com/user' + userString, {
+    const response = await fetch('https://i-love-icics-backend.herokuapp.com/user/' + userString, {
         method: 'GET'
     });
     return response.json();
