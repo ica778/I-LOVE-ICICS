@@ -44,5 +44,5 @@ const uri = 'mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongod
 mongoose.connect(uri);
 const connection = mongoose.connection;
 connection.once('open', () => {
-    console.log("MongoDB connection successful");
+    console.log("MongoDB connection successful===============================================================");
 });
