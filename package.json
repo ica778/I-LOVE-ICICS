@@ -37,7 +37,7 @@
   "scripts": {
 	"start": "npm --prefix ./server/ run-script start",
     "build": "react-scripts build",
-	"heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build",
+	"heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build && npm --prefix ./server/ install",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
