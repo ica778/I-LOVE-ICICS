@@ -23,10 +23,19 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-router.get('/test', function (req, res, next) {
-	console.log(req.query.text);
-	let tst = nlp(req.query.text);
-	return res.send(tst.contract().text());
+router.get('/test', async function (req, res, next) {
+	try {
+		let sentences = await Sentence.find();
+		let sentence = sentences[0];
+		console.log(sentence.upvotesLast24Hours);
+		sentence.upvotesLast24Hours.pop();
+		await sentence.save();
+
+		return res.send(sentence.text);	
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send(err);
+	}
 })
 
 router.get('/:id/comments', async (req, res) => {
@@ -52,7 +61,20 @@ router.get('/recent50/', async function(req, res, next) {
 		let orderKey = req.query.orderKey;
 		console.log(orderKey);
 		let timeFilterKey = req.query.timeFilterKey;
-		aggregateArr.push({ $limit: 50 });
+
+		if (orderKey) {
+			if (orderKey === 'recent') {
+				aggregateArr.push({ $sort: { createdAt: -1 }});
+			} else if (orderKey === 'trending') {
+				if (timeFilterKey === '7 days') {
+					aggregateArr.push({ $sort: { upvotesLast7DaysCount: -1 }});
+				} else if (timeFilterKey === '24 hours') {
+					aggregateArr.push({ $sort: { upvotesLast24HoursCount: -1 }});
+				} else if (timeFilterKey === '30 days') {
+					aggregateArr.push({ $sort: { upvotesLast30DaysCount: -1 }});
+				}
+			}
+		}
 
 		if (id) {
 			let querySentence = await Sentence.findById(id);
@@ -61,26 +83,7 @@ router.get('/recent50/', async function(req, res, next) {
 			aggregateArr.push({$match: filter});			
 		}
 
-		if (timeFilterKey) {
-			let date = new Date();
-			if (timeFilterKey === '7 days') {
-				date.setDate(date.getDate() - 7);
-				aggregateArr.push({ $match: { createdAt: { $gt: date }}});
-			} else if (timeFilterKey === '30 days') {
-				date.setDate(date.getDate() - 30);
-				aggregateArr.push({ $match: { createdAt: { $gt: date }}});
-			} else if (timeFilterKey === '24 hours') {
-				date.setDate(date.getDate() - 1);
-				aggregateArr.push({ $match: { createdAt: { $gt: date }}});
-			}
-		}
-
-		if (orderKey) {
-			if (orderKey === 'viewCount') {
-				aggregateArr.push({$sort: { viewCount: -1 }});
-			} else if (orderKey === 'usefulnessRating') aggregateArr.push({$sort: { usefulnessRating: -1 }});
-			else if (orderKey === 'recent') aggregateArr.push({ $sort: { createdAt: -1 }});
-		}
+		aggregateArr.push({ $limit: 50 });
 
 		let sentences = await Sentence.aggregate(aggregateArr);
 		console.log(sentences);
@@ -113,6 +116,7 @@ router.get('/search', async function (req, res, next) {
 	try {
 		let searchText = req.query.search;
 		let highlightedPart = req.query.highlightedPart;
+		let lastSentenceId = req.query.lastSentenceId;
 		let aggregateArr = [];
 		if (!highlightedPart && !searchText) {
 			throw new Error('Must fill at least one of the search boxes.')
@@ -132,8 +136,10 @@ router.get('/search', async function (req, res, next) {
 					let exactWords = textsBetweenChar(searchText, '/');
 					console.log(exactWords);
 					for (let i of exactWords) {
+						let regString = `(^|.* )"*${i}($|["'*\\.\\?,! ]+ *.*)`;
+						console.log(regString);
 						aggregateArr.push(
-							{ $match: { text: { $regex: new RegExp('.*' + i + '.*', "i") } } }
+							{ $match: { text: { $regex: new RegExp(`(^|.* )"*${i}($|["'*\\.\\?,! ]+ *.*)`, "i")}}}
 						);
 					}
 				} else {
@@ -160,11 +166,11 @@ router.get('/search', async function (req, res, next) {
 				let i = searchTextArr[a];
 
 				if (i[0] === '{') {
-					regexString = regexString + ' ' + '([^_]+)';
+					regexString = regexString + ' ' + '[A-Za-z]+';
 				} else {
 					let expanded = nlp(i).contractions().expand().text();
 					if (expanded) {
-						i = '(' + i + '|' + expanded + ')';
+						i = `(${i}|${expanded})`
 					} else if (a < searchTextArr.length - 1) {
 						// looking to contract
 						let potentialContract = i + ' ' + searchTextArr[a + 1];
@@ -176,19 +182,22 @@ router.get('/search', async function (req, res, next) {
 							// "want to"
 							// "wanna"
 							console.log('we found one boys!')
-
-							i = '(' + potentialContract + '|' + tried + ')';
+							i = `(${potentialContract}|${tried})`
 							a++;
 						}
 					}
 					regexString = regexString + ' ' + i;
 				}
 			}
+			// (^|.* )"*He [A-Za-z]+ went to the mall["*\.\?,! ]+ *[A-Za-z]*
 			regexString = regexString.trim();
+			console.log('printing regex string');
 			console.log(regexString);
-			aggregateArr.push(
-				{ $match: { text: { $regex: new RegExp('.*' + regexString + '.*', "i")}}}
-			);
+			if (regexString) {
+				aggregateArr.push(
+					{ $match: { text: { $regex: new RegExp(`(^|.* )"*${regexString}($|["'*\\.\\?,! ]+ *.*)`, "i")}}}
+				);
+			}
 			
 			// Find the parts to remove from text if there are any
 			if (searchText.includes('\\')) {
@@ -197,7 +206,7 @@ router.get('/search', async function (req, res, next) {
 				let removeTextArr = textsBetweenChar(searchText, '\\');
 				for (let i of removeTextArr) {
 					aggregateArr.push(
-						{ $match: { text: { $regex: new RegExp('^(?!' + i + ' |.+ ' + i + ' .+|.+ ' + i + '$).*', "i") }}}
+						{ $match: { text: { $regex: new RegExp(`^(?!"*'*${i}"*'*\\.*,*\\?*!* .+|.+ "*'*${i}"*'*\\.*,*\\?*!* .+|.+ "*'*${i}"*'*\\.*,*\\?*!*$).*`, "i")}}}
 					);
 				}
 			}
@@ -250,7 +259,8 @@ router.get('/search', async function (req, res, next) {
 router.post('/', async function(req, res, next) {
 	try {
 		let text = req.body.text.trim();
-		let userId = req.headers.userId;
+		let userid = req.headers.userid;
+		console.log(userid);
 		let source = req.body.source ? req.body.source.trim() : '';
 		let highlightedPart = req.body.highlightedPart ? req.body.highlightedPart : '';
 		let posString = [];
@@ -263,20 +273,29 @@ router.post('/', async function(req, res, next) {
 		}
 		console.log(posString);
 		console.log(highlightedPart);
-		let sentence = new Sentence({text: text, usefulnessRating: 0, viewCount: 0, highlightedPart: highlightedPart, source: source, posString: posString, comments: []});
+		let sentence = new Sentence(
+			{
+				text: text, 
+				usefulnessRating: 0, 
+				submittedBy: userid,
+				viewCount: 0, 
+				highlightedPart: highlightedPart, 
+				source: source, 
+				posString: posString, 
+				comments: [], 
+				upvotesLast24Hours: [], 
+				upvotesLast7Days: [], 
+				upvotesLast30Days: [],
+				upvotesLast24HoursCount: 0,
+				upvotesLast7DaysCount: 0,
+				upvotesLast30DaysCount: 0,
+			});
 		let sentenceSaved = await sentence.save();
 
-		User.findByIdAndUpdate(userId,
-			{
-				$push: { submittedSentences: sentence._id}
-			}, function (err, result) {
-				if (err) {
-					return res.status(500).send(err);
-				} else {
-					console.log(result);
-					return res.send(result);
-				}
-			});
+		let user = await User.findById(userid);
+		user.submittedSentences = [...user.submittedSentences, sentence._id]
+		await user.save();
+		return res.send(sentence);
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
@@ -291,14 +310,27 @@ router.put('/viewcount', async function (req, res, next) {
 				$in: ids
 			}
 		});
-		console.log('bruh');
 		sentences.forEach(async (sentence) => {
-			console.log('what the fuck');
-			console.log(sentence.viewCount);
 			sentence.viewCount = sentence.viewCount + 1;
-			console.log(sentence.viewCount)
 			await sentence.save();
 		})
+		return res.send('OK');
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send(err);
+	}
+})
+
+router.put('/upvote', async function (req, res, next) {
+	try {
+		let id = req.body.id;
+		let sentence = await Sentence.findById(id);
+		sentence.upvotesLast24Hours = [new Date(), ...sentence.upvotesLast24Hours];
+		sentence.usefulnessRating = sentence.usefulnessRating + 1;
+		sentence.upvotesLast24HoursCount = sentence.upvotesLast24HoursCount + 1;
+		sentence.upvotesLast7DaysCount = sentence.upvotesLast7DaysCount + 1;
+		sentence.upvotesLast30DaysCount = sentence.upvotesLast30DaysCount + 1;
+		await sentence.save();
 		return res.send('OK');
 	} catch (err) {
 		console.log(err);

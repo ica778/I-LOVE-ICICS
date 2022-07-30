@@ -8,12 +8,22 @@ const sentenceSchema = new Schema(
     posString: [{ type: String }],
 	viewCount: Number,
 	highlightedPart: String,
+	submittedBy: {
+		type: Schema.Types.ObjectId,
+		ref: 'User'
+	},
     comments: [
       {
         type: Schema.Types.ObjectId,
         ref: 'Comment',
       },
     ],
+	upvotesLast24HoursCount: Number,
+	upvotesLast7DaysCount: Number,
+	upvotesLast30DaysCount: Number,
+	upvotesLast24Hours: [{ type: Date }],
+	upvotesLast7Days: [{ type: Date}],
+	upvotesLast30Days: [{ type: Date }]
   },
   { timestamps: true }
 );

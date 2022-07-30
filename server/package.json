@@ -17,6 +17,7 @@
     "moment": "^2.29.4",
     "mongoose": "^6.4.3",
     "morgan": "~1.9.1",
+    "node-cron": "^3.0.1",
     "password-hash-and-salt": "^0.1.4",
     "pos": "^0.4.2"
   },

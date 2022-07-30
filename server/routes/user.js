@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 const User = require('../models/user');
+const Sentence = require('../models/sentence');
 const bcrypt = require('bcrypt');
+
 
 /* GET users listing. */
 router.get('/', async function(req, res, next) {
@@ -26,6 +28,21 @@ router.get('/:id/sentences', async function(req, res, next) {
 			submittedSentences: user.submittedSentences,
 			savedSentences: user.savedSentences
 		});
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send(err);
+	}
+})
+
+router.put('/:id/save/:sentenceid', async function(req, res, next) {
+	try {
+		const user = await User.findById(req.params.id);
+		const sentence = await Sentence.findById(req.params.sentenceid);
+
+		user.savedSentences.push(sentence._id);
+		console.log(`pushed ${sentence._id}`);
+		await user.save();
+		return res.send(sentence);
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
