@@ -25,6 +25,8 @@ app.use('/sentence', sentenceRouter);
 app.use('/user', userRouter);
 app.use('/comment', commentRouter);
 
+console.log("TESTING123");
+
 mongoose.connect(
     "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongodb.net/?retryWrites=true&w=majority", 
     {
