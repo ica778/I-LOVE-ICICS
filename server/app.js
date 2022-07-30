@@ -25,31 +25,18 @@ app.use('/sentence', sentenceRouter);
 app.use('/user', userRouter);
 app.use('/comment', commentRouter);
 
-/*
+
 mongoose.connect(
     "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongodb.net/?retryWrites=true&w=majority", 
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }).then(() => {
-		app.listen(3001, () => {
-			'app listening on port 3001'
-		});
+		app.set('port', (process.env.PORT || 3001));
+		app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
+			console.log("Server is running.");
+		  });
 	}).catch((err) => {
 	console.log("encountered an ERROR!!!!");
 	console.log(err);
-});
-*/
-
-
-const uri = 'mongodb+srv://m001-student:m001-mongodb-basics@sandbox.ar138.mongodb.net/?retryWrites=true&w=majority';
-mongoose.connect(uri);
-
-const connection = mongoose.connection;
-app.set('port', (process.env.PORT || 3001));
-app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
-	console.log("Server is running.");
-  });
-connection.once('open', () => {
-    console.log("MongoDB connection successful===============================================================");
 });
