@@ -3,6 +3,7 @@ import { Button } from '@material-ui/core';
 import styles from './EditAccount.module.scss';
 import { useState } from 'react';
 import { updateAccountInformationAsync } from '../redux/user/thunks';
+import { ToastContainer, toast } from 'react-toastify';
 
 function EditAccount() {
     const dispatch = useDispatch();
@@ -28,11 +29,27 @@ function EditAccount() {
         if (username) {
             dispatch(updateAccountInformationAsync({id: localStorage.getItem('username'), username: username}));
             localStorage.setItem('username', username);
-            alert("Your new username is: " + username);
+            toast.success('Your new username is: ' + username, {
+				position: "top-right",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+			});
         }
         if (password && password === passwordRedo) {
             dispatch(updateAccountInformationAsync({id: localStorage.getItem('username'), password: password}));
-            alert("Your new password is: " + password);
+            toast.success('Your new password is: ' + password, {
+				position: "top-right",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+			});
         }
         
     } 
@@ -50,6 +67,14 @@ function EditAccount() {
                 <input value={email} onChange={setEmailInput} placeholder="Add Email" size="20"/>
             </form>
             <Button className={styles.input} onClick={handleEditAccount}>Apply Changes</Button>
+            <ToastContainer
+				position='top-right'
+				autoClose={5000}
+				hideProgressBar={false}
+				closeOnClick
+				rtl={false}
+				newestOnTop={true}
+				/>
         </div>
     );
 }

@@ -10,19 +10,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function LoginCredentials() {
-    const dispatch = useDispatch();
-
     const [userId, setUserId] = useState();
-
     const [usernameInput, setUsernameInput] = useState("");
-    function setUsername(val) {
-        setUsernameInput(val.target.value);
-    }
-
     const [passwordInput, setPasswordInput] = useState("");
-    function setPassword(val) {
-        setPasswordInput(val.target.value);
-    }
 
     const handleLogin = async () => {
 		try {
@@ -69,19 +59,8 @@ function LoginCredentials() {
         localStorage.clear();
     }
 
-    if (localStorage.getItem("userId")) {
-        return (
-            <div className={styles.logoutBox}>
-                <div className={styles.logoutForm}>
-                    <h1>You are logged in as {localStorage.getItem("username")}</h1>
-                    <Button onClick={handleLogout}>Logout</Button>
-                </div>         
-            </div>
-        )
-    }
-
-    return (
-        <div className={styles.loginBox}>
+	let isLoggedIn = (
+		<div className={styles.loginBox}>
             <form className={styles.formControl}>
                 <label>Login</label>
                 <input value={usernameInput} onChange={(e) => setUsernameInput(e.target.value) } placeholder="Username" size="20"/>
@@ -97,6 +76,24 @@ function LoginCredentials() {
 				newestOnTop={true}
 				/>
         </div>
+	);
+	
+
+    if (localStorage.getItem("userId")) {
+        isLoggedIn = (
+            <div className={styles.logoutBox}>
+                <div className={styles.logoutForm}>
+                    <h1>You are logged in as {localStorage.getItem("username")}</h1>
+                    <Button onClick={handleLogout}>Logout</Button>
+                </div>         
+            </div>
+        );
+    }
+
+    return (
+		<div>
+			{isLoggedIn}
+		</div>
     );
 }
 
