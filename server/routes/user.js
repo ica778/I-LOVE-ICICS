@@ -19,6 +19,22 @@ router.get('/', async function(req, res, next) {
 	}
 });
 
+// search users
+// INPUT: :id = username
+router.get('/:id', async function(req, res, next) {
+	try {
+        let ret = [];
+		const users = await User.find({"username":{$regex:req.params.id}});
+        for (let o of users) {
+            ret.push({_id: o._id, username: o.username, password: o.password});
+        }
+        console.log(JSON.stringify(ret));
+        return res.send(ret);
+	} catch (err) {
+		return res.status(500).send(err);
+	}
+});
+
 router.get('/:id/sentences', async function(req, res, next) {
 	try {
 		const user = await User.findById(req.params.id);
@@ -90,6 +106,22 @@ router.post('/login/', async function(req, res, next) {
         })
     } catch (err) {
 		console.log(err);
+        return res.status(500).send(err);
+    }
+})
+
+// TODO: make update by _id instead of username, currently use _id because User.updateOne doesn't work with _id
+router.put('/update/', async function(req, res, next) {
+    try {
+        if (req.body.username) {
+            const user = await User.updateOne({username: req.body.id}, {$set: {username: req.body.username}});
+            return res.send(user);
+        }
+        else if (req.body.password) {
+            const user = await User.updateOne({username: req.body.id}, {$set: {password: req.body.password}});
+            return res.send(user);
+        }
+    } catch (err) {
         return res.status(500).send(err);
     }
 })
