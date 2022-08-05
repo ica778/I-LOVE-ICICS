@@ -118,7 +118,8 @@ router.put('/update/', async function(req, res, next) {
             return res.send(user);
         }
         else if (req.body.password) {
-            const user = await User.updateOne({username: req.body.id}, {$set: {password: req.body.password}});
+            const hashedPass = await bcrypt.hash(req.body.password, 10);
+            const user = await User.updateOne({username: req.body.id}, {$set: {hash: hashedPass}});
             return res.send(user);
         }
     } catch (err) {
