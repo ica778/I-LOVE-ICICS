@@ -202,7 +202,7 @@ function Searchbar() {
 				<Typography style={{marginBottom: '10px'}}>Search a Keyword</Typography>
 				<TextField style={{maxWidth: '90%', minWidth: '90%'}} id="searchKeyword" label="Search a phrase or keyword..." variant="outlined" value={search} onChange={handleTextChange}/>
 				
-				<Typography style={{marginBottom: '10px'}}>Search an Important Part </Typography>
+				<Typography style={{marginBottom: '10px'}}>Search a Highlighted Part </Typography>
 				<TextField style={{maxWidth: '90%', minWidth: '90%'}} id="searchHighlightedPart" label="Search a phrase or keyword... (OPTIONAL)" variant="outlined" value={highlightedPart} onChange={handleTextChange}/>
 				<br/>
 				<br/>
