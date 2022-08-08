@@ -15,6 +15,8 @@ import Sentence from './Sentence';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../config';
+import { useSelector, useDispatch } from 'react-redux';
+import { bottomOfPage, updateExploreSentences, setExploreSentences } from '../actions';
 
 const modalStyle = {
   position: 'absolute',
@@ -31,48 +33,73 @@ const modalStyle = {
   overflow: 'auto',
 };
 
-const populationArr = ['submittedBy', 'text', 'responses'];
 const populate = 'submittedBy text responses';
 
 function Explore() {
   const [selectedSentence, setSelectedSentence] = useState(null);
   const [timeFilterKey, setTimeFilterKey] = useState('7 days');
   const [orderKey, setOrderKey] = useState('recent');
-  const [sentenceData, setSentenceData] = useState([]);
+  const dispatch = useDispatch();
 
-//   const { data } = useQuery(
-//     'sentences',
-//     getSentencesQuery(populate, orderKey, timeFilterKey),
-//     {
-//       onError: err => {
-//         console.error(err);
-//       },
-//       onSuccess: setSentenceData
-//     }
-//   );
+  let atBottomOfPage = useSelector(function (state) {
+    return state.searchpageReducer.atBottomOfPage;
+  });
 
-  async function fetchSentences() {
-	console.log(orderKey);
-	// const resp = await getSentencesQuery(populationArr, orderKey, timeFilterKey);
-	let res = await axios.get(baseUrl + '/sentence/recent50', {
-		params: {
-			populate, orderKey, timeFilterKey
-		}
-	})
-	
-	setSentenceData(res.data);
+  let exploreSentences = useSelector(function (state) {
+    return state.searchpageReducer.exploreSentences;
+  });
+
+  useEffect(() => {
+    if (atBottomOfPage != null && atBottomOfPage) {
+      if (exploreSentences.length > 0) {
+        fetchSentences(exploreSentences[exploreSentences.length - 1]._id);
+      }
+      dispatch(bottomOfPage(null));
+      setTimeout(function() {
+        dispatch(bottomOfPage(false));
+      }, 250);
+    }
+  }, [atBottomOfPage])
+
+  async function fetchSentences(id) {
+    console.log(exploreSentences[exploreSentences.length - 1].text)
+    console.log(id);
+    let res;
+
+    if (!id) {
+      res = await axios.get(baseUrl + '/sentence/recent50', {
+      params: {
+        populate, orderKey, timeFilterKey
+      }
+    })
+    } else {
+      res = await axios.get(baseUrl + '/sentence/recent50', {
+        params: {
+          populate, orderKey, timeFilterKey, sentenceId: id
+        }
+      })
+    }
+    
+    dispatch(updateExploreSentences(res.data));
+  }
+
+  async function updateSentences() {
+    console.log(orderKey);
+    let res;
+    res = await axios.get(baseUrl + '/sentence/recent50', {
+      params: {
+        populate, orderKey, timeFilterKey
+      }
+    })
+    dispatch(setExploreSentences(res.data));
   }
 
   useEffect(() => {
-	fetchSentences()
+	  updateSentences()
   }, [orderKey, timeFilterKey])
-  
-//   useEffect(() => {
-// 	getSentencesQuery(populationArr, orderKey, timeFilterKey);
-//   }, [timeFilterKey])
 
   return (
-    <div>
+    <div id='parentdiv'>
 
       <div className={styles.dropBox}>
         <FormControl className={styles.dropDown}>
@@ -119,8 +146,8 @@ function Explore() {
         </Box>
       </Modal>
 
-      <div id="hey" className={styles.grid}>
-        {sentenceData.map(sentence => (
+      <div id="hey" style={{overflow: 'auto'}}>
+        {exploreSentences.map(sentence => (
           <div
 		    userid={sentence.submittedBy}
             key={sentence._id}

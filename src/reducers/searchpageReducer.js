@@ -39,7 +39,7 @@
 // ];
 
 const searchpageReducer = (
-  state = { currentSearch: { searchText: 'testing', results: [] } },
+  state = { latestSearchText: '', latestHighlightText: '', currentSearch: { searchText: 'testing', results: [] }, exploreSentences: [], atBottomOfPage: false },
   action
 ) => {
   switch (action.type) {
@@ -51,7 +51,14 @@ const searchpageReducer = (
           searchText: action.payload,
         },
       };
-	case 'UPDATE_CURRENT_SEARCH_RESULTS':
+    // for after performing an actual search, temporarily saving the search metadata
+    case 'UPDATE_LATEST_SEARCH_TEXT':
+      return {
+        ...state,
+        latestSearchText: action.payload.latestSearchText,
+        latestHighlightText: action.payload.latestHighlightText
+      };
+	case 'SET_CURRENT_SEARCH_RESULTS':
 		return {
 			...state,
 			currentSearch: {
@@ -59,6 +66,29 @@ const searchpageReducer = (
 				results: action.payload
 			}
 		}
+  case 'UPDATE_CURRENT_SEARCH_RESULTS':
+    return {
+      ...state,
+      currentSearch: {
+        ...state.currentSearch,
+        results: [...state.currentSearch.results, ...action.payload]
+      }
+    }
+  case 'HIT_BOTTOM_OF_PAGE':
+    return {
+      ...state,
+      atBottomOfPage: action.payload
+    }
+  case 'UPDATE_EXPLORE_SENTENCES':
+    return {
+      ...state,
+      exploreSentences: [...state.exploreSentences, ...action.payload]
+    }
+  case 'SET_EXPLORE_SENTENCES':
+    return {
+      ...state,
+      exploreSentences: action.payload
+    }
     default:
       return state;
   }
