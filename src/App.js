@@ -9,8 +9,23 @@ import CreateAccount from './components/CreateAccount';
 import UserProfile from './components/UserProfile';
 import EditAccount from './components/EditAccount';
 import SearchUsers from './components/SearchUsers';
+import { useDispatch, useSelector } from 'react-redux';
+import { bottomOfPage } from './actions/index';
 
 function App() {
+  const dispatch = useDispatch();
+  let atBottomOfPage = useSelector(function (state) {
+    return state.searchpageReducer.atBottomOfPage;
+  });
+
+  document.body.onscroll = function(e) {
+    if (atBottomOfPage !== null) {
+      const c = window.scrollY + window.innerHeight;
+      if (Math.abs(c - document.body.offsetHeight) < 1) {
+        dispatch(bottomOfPage(true));
+      }
+    }
+  };
   return (
     <Router>
       <NavBar />

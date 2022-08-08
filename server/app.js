@@ -34,13 +34,14 @@ app.use(express.static(path.join(__dirname, '../build')));
 app.get('*', (req, res) => {
 	res.sendFile(path.join(__dirname, '../build/index.html'));
 });
-
+// "mongodb://127.0.0.1:27017"
 mongoose.connect(
-    "mongodb+srv://root:cypressmountain@cypress.ofwuv.mongodb.net/language_project", 
+    'mongodb+srv://root:xuOuq4BJ7cN28MEc@cypress.ofwuv.mongodb.net/language_project',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
-    });
+    }).catch((err) => {console.log(err)});
+
 
 module.exports = app;
 

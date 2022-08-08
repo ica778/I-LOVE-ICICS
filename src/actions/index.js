@@ -37,6 +37,13 @@ export const updateCurrentSearchText = searchData => {
     }
 }
 
+export const setCurrentSearchResults = results => {
+    return {
+        type: 'SET_CURRENT_SEARCH_RESULTS',
+        payload: results
+    }
+}
+
 export const updateCurrentSearchResults = results => {
     return {
         type: 'UPDATE_CURRENT_SEARCH_RESULTS',
@@ -76,5 +83,33 @@ export const updateUserProfileMode = mode => {
     return {
         type: 'UPDATE_USER_PROFILE_MODE',
         payload: mode
+    }
+}
+
+export const bottomOfPage = payload => {
+    return {
+        type: 'HIT_BOTTOM_OF_PAGE',
+        payload
+    }
+}
+
+export const updateExploreSentences = payload => {
+    return {
+        type: 'UPDATE_EXPLORE_SENTENCES',
+        payload
+    }
+}
+
+export const setExploreSentences = payload => {
+    return {
+        type: 'SET_EXPLORE_SENTENCES',
+        payload
+    }
+}
+
+export const updateLatestSearchText = payload => {
+    return {
+        type: 'UPDATE_LATEST_SEARCH_TEXT',
+        payload
     }
 }

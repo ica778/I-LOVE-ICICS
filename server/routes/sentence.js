@@ -6,7 +6,9 @@ const User = require('../models/user');
 const moment = require('moment');
 var pos = require('pos');
 var nlp = require('compromise');
-// import findExactWords from '../utils';
+const { MongoClient, ObjectId } = require("mongodb");
+const client = new MongoClient("mongodb+srv://root:xuOuq4BJ7cN28MEc@cypress.ofwuv.mongodb.net/language_project");
+client.connect();
 
 /* GET sentence listing. */
 router.get('/', async function (req, res, next) {
@@ -25,13 +27,26 @@ router.get('/', async function (req, res, next) {
 
 router.get('/test', async function (req, res, next) {
 	try {
-		let sentences = await Sentence.find();
-		let sentence = sentences[0];
-		console.log(sentence.upvotesLast24Hours);
-		sentence.upvotesLast24Hours.pop();
-		await sentence.save();
+		const db = client.db('language_project');
+		let aggr_step = {
+			$match: {
+				$expr: {
+					$function: {
+						body: `function(posString) {
+							return posString.length > 2;
+						}`,
+						args: ["$posString"],
+						lang: "js"
+					}
+				}
+			}
+		}
 
-		return res.send(sentence.text);	
+		let sentences = db.collection('sentences').aggregate([aggr_step]);
+		for await (const doc of sentences) {
+			console.log(doc);
+		}
+		return res.send(sentences);	
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
@@ -51,45 +66,86 @@ router.get('/:id/comments', async (req, res) => {
 });
 
 router.get('/recent50/', async function(req, res, next) {
-	console.log(' at recent 50 from backend');
 	let aggregateArr = [];
 	try {
 		let populate = req.query.populate;
-		console.log(populate);
 
 		let id = req.query.sentenceId;
 		let orderKey = req.query.orderKey;
-		console.log(orderKey);
 		let timeFilterKey = req.query.timeFilterKey;
 
 		if (orderKey) {
 			if (orderKey === 'recent') {
 				aggregateArr.push({ $sort: { createdAt: -1 }});
+				let date = new Date();
+				if (timeFilterKey === '7 days') {
+					date.setDate(date.getDate() - 7);
+					aggregateArr.push({ $match: { createdAt: { $gt: date }}});
+				} else if (timeFilterKey === '24 hours') {
+					date.setDate(date.getDate() - 1);
+					aggregateArr.push({ $match: { createdAt: { $gt: date }}});
+				} else if (timeFilterKey === '30 days') {
+					date.setDate(date.getDate() - 30);
+					aggregateArr.push({ $match: { createdAt: { $gt: date }}});
+				}
+
+				if (id) {
+					let querySentence = await Sentence.findById(id);
+					let b = querySentence.createdAt;
+					aggregateArr.push({ $match: { createdAt: { $lt: b }}});
+				}
+
+				aggregateArr.push({ $limit: 10 });
+				let sentences = await Sentence.aggregate(aggregateArr);
+				await Comment.populate(sentences, 'text', () => {});
+				return res.send(sentences);
+
 			} else if (orderKey === 'trending') {
 				if (timeFilterKey === '7 days') {
-					aggregateArr.push({ $sort: { upvotesLast7DaysCount: -1 }});
+					aggregateArr.push({ $sort: { upvotesLast7DaysCount: -1, _id: -1 }});
+					if (id) {
+						let querySentence = await Sentence.findById(id);
+						let b = querySentence.upvotesLast7DaysCount;
+						aggregateArr.push({$match: { upvotesLast7DaysCount: { $lte: b }}});
+					}
 				} else if (timeFilterKey === '24 hours') {
-					aggregateArr.push({ $sort: { upvotesLast24HoursCount: -1 }});
+					aggregateArr.push({ $sort: { upvotesLast24HoursCount: -1, _id: -1 }});
+					if (id) {
+						let querySentence = await Sentence.findById(id);
+						let b = querySentence.upvotesLast24HoursCount;
+						aggregateArr.push({$match: { upvotesLast24HoursCount: { $lte: b }}});
+					}
 				} else if (timeFilterKey === '30 days') {
-					aggregateArr.push({ $sort: { upvotesLast30DaysCount: -1 }});
+					aggregateArr.push({ $sort: { upvotesLast30DaysCount: -1, _id: -1 }});
+					if (id) {
+						let querySentence = await Sentence.findById(id);
+						let b = querySentence.upvotesLast30DaysCount;
+						aggregateArr.push({$match: { upvotesLast30DaysCount: { $lte: b }}});
+					}
 				}
+				if (!id) {
+					aggregateArr.push({ $limit: 10 });
+				}
+				let sentences = await Sentence.aggregate(aggregateArr);
+				console.log(`have a total length of: ${sentences.length}`)
+				if (id) {
+					let returnSentences = [];
+					for (let i = 0; i < sentences.length; i++) {
+						if (sentences[i]._id.toString() === id) {
+							console.log('found!!!!')
+							// change to 51 if limit is 50
+							returnSentences = sentences.slice(i+1, i+11);
+							break;
+						}
+					}
+					console.log('RETURN SENTENCES LENGTH')
+					console.log(returnSentences.length);
+					await Comment.populate(returnSentences, 'text', () => {});
+					return res.send(returnSentences);
+				}
+				return res.send(sentences);
 			}
-		}
-
-		if (id) {
-			let querySentence = await Sentence.findById(id);
-			let date = querySentence.createdAt;
-			const filter = { createdAt: { $lt: date }};
-			aggregateArr.push({$match: filter});			
-		}
-
-		aggregateArr.push({ $limit: 50 });
-
-		let sentences = await Sentence.aggregate(aggregateArr);
-		console.log(sentences);
-		
-		await Comment.populate(sentences, 'text', () => {});
-		return res.send(sentences);
+		}		
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
@@ -112,6 +168,18 @@ const textsBetweenChar = (text, char) => {
   return retWords;
 };
 
+const searchHasPos = (txtArr) => {
+	for (let a of txtArr) {
+		if (a && a.length > 0 && a[0] === '{' && a[a.length - 1] === '}') {
+			let b = a.slice(1, -1);
+			if (b.length > 0) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 router.get('/search', async function (req, res, next) {
 	try {
 		let searchText = req.query.search;
@@ -124,7 +192,7 @@ router.get('/search', async function (req, res, next) {
 
 		if (highlightedPart) {
 			aggregateArr.push(
-				{ $match: { highlightedPart: { $regex: new RegExp('.*' + highlightedPart + '.*', 'i') } } }
+				{ $match: { highlightedPart: { $regex: new RegExp(`(^|.* )"*${highlightedPart}($|["'*\\.\\?,! ]+ *.*)`)}}}
 			);
 		}
 		let regexString = "";
@@ -211,13 +279,36 @@ router.get('/search', async function (req, res, next) {
 				}
 			}
 		}
+		aggregateArr.push({ $sort: { createdAt: -1 }})
+		if (!searchHasPos(searchTextArr)) {
+			if (lastSentenceId) {
+				let querySentence = await Sentence.findById(lastSentenceId);
+				let date = querySentence.createdAt;
+				const filter = { createdAt: { $lt: date }};
+				aggregateArr.push({$match: filter});			
+			}
 
-		let searchRes = await Sentence.aggregate(aggregateArr);
-		let returnRes = [];
-		let seenPosInSearchText = false;
+			aggregateArr.push({ $limit: 10 });
+			let searchRes = await Sentence.aggregate(aggregateArr);
+			return res.send(searchRes);
+		} else {
+			// search has part of speech
+			let searchRes = await Sentence.aggregate(aggregateArr);
+			let sentenceDate;
+			if (lastSentenceId) {
+				let querySentence = await Sentence.findById(lastSentenceId);
+				sentenceDate = querySentence.createdAt;
+			}
 
-		if (searchText) {
+			let returnRes = [];
+
 			for (let elt of searchRes) {
+				if (sentenceDate) {
+					if (elt.createdAt >= sentenceDate) {
+						// current elt was created after the last sentence id from the frontend page
+						continue;
+					}
+				}
 				let text = elt.text;
 				let idx = text.search(regexString);
 				let counter = 0;
@@ -235,7 +326,6 @@ router.get('/search', async function (req, res, next) {
 					if (searchTextArr[i][0] === '{') {
 						let posText = searchTextArr[i].slice(1, -1);
 						if (posText.length > 0) {
-							seenPosInSearchText = true;
 							if (posText !== elt.posString[counter]) {
 								includeCurrentElt = false;
 								break;
@@ -245,11 +335,12 @@ router.get('/search', async function (req, res, next) {
 				}
 	
 				if (includeCurrentElt) returnRes.push(elt);
+				if (returnRes.length === 10) {
+					return res.send(returnRes);
+				}
 			}
+			return res.send(returnRes);
 		}
-		if (seenPosInSearchText) return res.send(returnRes);
-		else return res.send(searchRes);
-		
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
