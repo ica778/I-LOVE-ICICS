@@ -26,11 +26,12 @@ import { useNavigate } from "react-router-dom";
 
 
 const Sentence = props => {
-  let { userid, id, text, comments, highlightedPart } = props;
+  let { userid, id, text, comments, highlightedPart, usefulnessRating } = props;
   const [commentSectionOpen, setCommentSectionOpen] = useState(false);
   const [currentCommentText, setCurrentCommentText] = useState('');
   const [currentCommentsSentence, setCurrentCommentsSentence] = useState(comments);
   const [redirectBool, setRedirectBool] = useState(false);
+  const [usefulnessRatingVar, setUsefulnessRatingVar] = useState(usefulnessRating);
 
   const navigate = useNavigate();
 
@@ -103,6 +104,7 @@ const Sentence = props => {
 		const res = await axios.put(baseUrl + '/sentence/upvote', {
 			id
 		});
+    setUsefulnessRatingVar(usefulnessRatingVar + 1);
 	} catch (err) {
 		console.log(err);
 	}
@@ -120,12 +122,12 @@ const Sentence = props => {
   }
 
   const handleRedirectToProfile = async() => {
-	console.log(userid);
-	const res = await axios.get(baseUrl + `/user/${userid}/sentences`);
-	dispatch(updateOtherSavedSentences(res.data.savedSentences));
-	dispatch(updateOtherSubmittedSentences(res.data.submittedSentences));
-	dispatch(updateUserProfileMode('other'));
-	setRedirectBool(true);
+    console.log(userid);
+    const res = await axios.get(baseUrl + `/user/${userid}/sentences`);
+    dispatch(updateOtherSavedSentences(res.data.savedSentences));
+    dispatch(updateOtherSubmittedSentences(res.data.submittedSentences));
+    dispatch(updateUserProfileMode('other'));
+    setRedirectBool(true);
   }
 
   return (
@@ -153,7 +155,7 @@ const Sentence = props => {
             >
               {text}
             </CardContent>
-			
+			{usefulnessRatingVar > 0 && <Typography style={{position: 'absolute', left: '80%', bottom: '27%'}}>+{usefulnessRatingVar}</Typography>}
 			<IconButton style={{
 				position: 'absolute',
 				left: '81.5%'

@@ -75,6 +75,7 @@ function SearchResults(props) {
               text={searchResult.text}
               comments={searchResult.comments}
 			  highlightedPart={searchResult.highlightedPart}
+        usefulnessRating={searchResult.usefulnessRating}
             />
           </li>
         );

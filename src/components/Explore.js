@@ -141,6 +141,7 @@ function Explore() {
               id={selectedSentence._id}
               text={selectedSentence.text}
               comments={selectedSentence.comments}
+              usefulnessRating={selectedSentence.usefulnessRating}
             />
           ) : null}
         </Box>
