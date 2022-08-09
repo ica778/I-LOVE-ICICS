@@ -16,6 +16,7 @@
     "body-scroll-lock": "^4.0.0-beta.0",
     "dotenv": "^16.0.1",
     "highlightable": "^1.0.7",
+    "mark.js": "^8.11.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-highlight": "^0.14.0",

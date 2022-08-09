@@ -180,12 +180,28 @@ const searchHasPos = (txtArr) => {
 	return false;
 }
 
+const nthOccurence = (str, match, n) => {
+    var L= str.length, i= -1;
+    while(n-- && i++<L){
+        i= str.indexOf(match, i);
+        if (i < 0) break;
+    }
+    return i;
+}
+
+function isLetter(str) {
+	return str.length === 1 && str.match(/[a-z]/i);
+}
+
+
 router.get('/search', async function (req, res, next) {
 	try {
 		let searchText = req.query.search;
+		if (searchText === undefined) searchText = '';
 		let highlightedPart = req.query.highlightedPart;
 		let lastSentenceId = req.query.lastSentenceId;
 		let aggregateArr = [];
+		let searchTextNoNots = '';
 		if (!highlightedPart && !searchText) {
 			throw new Error('Must fill at least one of the search boxes.')
 		}
@@ -197,34 +213,33 @@ router.get('/search', async function (req, res, next) {
 		}
 		let regexString = "";
 		let searchTextArr = [];
+		let exactWords = [];
 		if (searchText) {
 			if (searchText.includes('/')) {
 				if (!searchText.includes('//')) {
 					// Find all "exact" matches requested (eg. by /bob went//to the pool/)
-					let exactWords = textsBetweenChar(searchText, '/');
-					console.log(exactWords);
+					exactWords = textsBetweenChar(searchText, '/');
 					for (let i of exactWords) {
 						let regString = `(^|.* )"*${i}($|["'*\\.\\?,! ]+ *.*)`;
-						console.log(regString);
 						aggregateArr.push(
 							{ $match: { text: { $regex: new RegExp(`(^|.* )"*${i}($|["'*\\.\\?,! ]+ *.*)`, "i")}}}
 						);
 					}
 				} else {
-					let exactWords = textsBetweenChar(searchText, '/');
+					exactWords = textsBetweenChar(searchText, '/');
 					exactWords = exactWords.filter((val) => {
 						return val !== '';
 					})
-					let regexString = exactWords.join('.*');
+					let regexStringExactWords = exactWords.join('.*');
 					aggregateArr.push(
-						{ $match: { text: { $regex: new RegExp('.*' + regexString + '.*', "i") } } }
+						{ $match: { text: { $regex: new RegExp('.*' + regexStringExactWords + '.*', "i") } } }
 					);
 				}
 				searchText = searchText.slice(searchText.lastIndexOf('/') + 1);
 			}
 			// Find the "main" portion of text if there is one
 			let idxOfBackslash = searchText.indexOf('\\');
-			let searchTextNoNots = searchText;
+			searchTextNoNots = searchText;
 			if (idxOfBackslash !== -1) {
 				searchTextNoNots = searchText.substring(0, idxOfBackslash);
 			}
@@ -243,13 +258,10 @@ router.get('/search', async function (req, res, next) {
 						// looking to contract
 						let potentialContract = i + ' ' + searchTextArr[a + 1];
 						let tried = nlp(potentialContract).contract().text();
-						console.log(potentialContract);
-						console.log(tried);
 						if (tried !== potentialContract) {
 							// found a collapsible contraction
 							// "want to"
 							// "wanna"
-							console.log('we found one boys!')
 							i = `(${potentialContract}|${tried})`
 							a++;
 						}
@@ -259,8 +271,6 @@ router.get('/search', async function (req, res, next) {
 			}
 			// (^|.* )"*He [A-Za-z]+ went to the mall["*\.\?,! ]+ *[A-Za-z]*
 			regexString = regexString.trim();
-			console.log('printing regex string');
-			console.log(regexString);
 			if (regexString) {
 				aggregateArr.push(
 					{ $match: { text: { $regex: new RegExp(`(^|.* )"*${regexString}($|["'*\\.\\?,! ]+ *.*)`, "i")}}}
@@ -290,6 +300,40 @@ router.get('/search', async function (req, res, next) {
 
 			aggregateArr.push({ $limit: 10 });
 			let searchRes = await Sentence.aggregate(aggregateArr);
+			for (let elt of searchRes) {
+				elt['searchTextIdxs'] = [];
+				if (regexString) {
+					// let searchIdx = elt.text.toLowerCase().search(`(^|.* )"*${regexString}($|["'*\\.\\?,! ]+ *.*)`);
+					let searchIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${regexString}([ \\.,\\?"'!]|$)`)
+					if (!isLetter(elt.text[searchIdx])) searchIdx++;
+					elt['searchTextIdxs'].push({start: searchIdx, length: searchTextNoNots.length})
+				}
+				for (let exactWord of exactWords) {
+					// console.log(`on exact word ${exactWord}`);
+					// console.log(`for text ${elt.text}`);
+					// let nthCount = 1;
+					// let i = nthOccurence(elt.text, exactWord, nthCount);
+					// while (i !== -1) {
+					// 	console.log(`first i is ${i}`)
+					// 	elt['searchTextIdxs'].push({start: i, length: exactWord.length});
+					// 	i = nthOccurence(elt.text, exactWord, ++nthCount);
+					// }
+					let lastSeenIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
+					if (lastSeenIdx !== -1 && !isLetter(elt.text.toLowerCase()[lastSeenIdx])) lastSeenIdx++;
+					while (lastSeenIdx !== -1) {
+						elt['searchTextIdxs'].push({start: lastSeenIdx, length: exactWord.length});
+						let slicedString = elt.text.slice(lastSeenIdx + 1);
+						let tempLastSeenIdx = slicedString.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
+						if (tempLastSeenIdx === -1) {
+							lastSeenIdx = -1;
+							break;
+						}
+
+						if (!isLetter(slicedString[tempLastSeenIdx])) tempLastSeenIdx++;
+						lastSeenIdx = lastSeenIdx + tempLastSeenIdx + 1;
+					}
+				}
+			}
 			return res.send(searchRes);
 		} else {
 			// search has part of speech
@@ -310,16 +354,31 @@ router.get('/search', async function (req, res, next) {
 					}
 				}
 				let text = elt.text;
-				let idx = text.search(regexString);
+				let searchIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${regexString}([ \\.,\\?"'!]|$)`)
+				if (!isLetter(elt.text[searchIdx])) searchIdx++;
+				elt['searchTextIdxs'] = [{start: searchIdx, length: searchTextNoNots.length}];
+				for (let exactWord of exactWords) {
+					let lastSeenIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
+					if (lastSeenIdx !== -1 && !isLetter(elt.text.toLowerCase()[lastSeenIdx])) lastSeenIdx++;
+					while (lastSeenIdx !== -1) {
+						elt['searchTextIdxs'].push({start: lastSeenIdx, length: exactWord.length});
+						let slicedString = elt.text.slice(lastSeenIdx + 1);
+						let tempLastSeenIdx = slicedString.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
+						if (tempLastSeenIdx === -1) {
+							lastSeenIdx = -1;
+							break;
+						}
+
+						if (!isLetter(slicedString[tempLastSeenIdx])) tempLastSeenIdx++;
+						lastSeenIdx = lastSeenIdx + tempLastSeenIdx;
+					}
+				}
 				let counter = 0;
 				for (let i = 0; i < idx; i++) {
 					if (text[i] === ' ') {
 						counter++;
 					}
 				}
-				console.log('counter is ' + counter);
-				console.log(elt.posString)
-				console.log('orig string arr form is: ' + searchTextArr);
 				let includeCurrentElt = true;
 				// counter represents idx of the corresponding word to the searchText to start from 
 				for (let i = 0; i < searchTextArr.length; i++,counter++) {

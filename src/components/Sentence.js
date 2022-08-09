@@ -23,10 +23,11 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import AddIcon from '@mui/icons-material/Add';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from "react-router-dom";
+import Mark from "mark.js";
 
 
 const Sentence = props => {
-  let { userid, id, text, comments, highlightedPart, usefulnessRating } = props;
+  let { userid, id, text, comments, highlightedPart, usefulnessRating, searchTextIdxs } = props;
   const [commentSectionOpen, setCommentSectionOpen] = useState(false);
   const [currentCommentText, setCurrentCommentText] = useState('');
   const [currentCommentsSentence, setCurrentCommentsSentence] = useState(comments);
@@ -51,14 +52,21 @@ const Sentence = props => {
 	}
   }, [redirectBool])
 
+  useEffect(() =>{
+    setUsefulnessRatingVar(usefulnessRating);
+  }, [usefulnessRating])
+
   useEffect(() => {
-    console.log({ props });
-    console.log(currentComments);
     if (currentComments && id in currentComments) {
       setCommentSectionOpen(true);
       setCurrentCommentText(currentComments[id]);
     }
-  }, []);
+    if (searchTextIdxs) {
+      let markInstance = new Mark(document.querySelector(`#sentence${id}text`));
+      markInstance.unmark()
+      markInstance.markRanges(searchTextIdxs);
+    }
+  }, [searchTextIdxs]);
 
   const handleCommentOpenButton = async () => {
     console.log('Hi');
@@ -145,7 +153,7 @@ const Sentence = props => {
 				position: 'absolute',
 				top: '35px'
 			}} onClick={handleRedirectToProfile}> <PersonIcon/> </IconButton>
-            <CardContent
+            <CardContent id={`sentence${id}text`}
               style={{
 				left: '20px',
 				position: 'relative',
@@ -155,11 +163,12 @@ const Sentence = props => {
             >
               {text}
             </CardContent>
-			{usefulnessRatingVar > 0 && <Typography style={{position: 'absolute', left: '80%', bottom: '27%'}}>+{usefulnessRatingVar}</Typography>}
+			{/* {usefulnessRatingVar > 0 && <Typography style={{position: 'absolute', left: '79%', bottom: '27%'}}>+{usefulnessRatingVar}</Typography>} */}
 			<IconButton style={{
 				position: 'absolute',
-				left: '81.5%'
+				left: '79.5%'
 			}} onClick={handleUpvoteSentence}>
+        {usefulnessRatingVar > 0 && <Typography>+{usefulnessRatingVar}</Typography>}
 				<ThumbUpIcon/>
 			</IconButton>
 

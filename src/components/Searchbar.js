@@ -64,6 +64,7 @@ function Searchbar() {
 		await axios.put(baseUrl + '/sentence/viewcount', {
 			ids: res.data
 		})
+		console.log(res.data);
 		dispatch(updateLatestSearchText({latestSearchText: search, latestHighlightedText: highlightedPart}));
 		dispatch(setCurrentSearchResults(res.data));
 	}
