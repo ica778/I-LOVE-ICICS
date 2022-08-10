@@ -9,7 +9,7 @@ import {
   eraseCurrentComment,
   updateOtherSavedSentences,
   updateOtherSubmittedSentences,
-  updateUserProfileMode
+  updateUserProfileMode,
 } from '../actions/index';
 import { useSelector, useDispatch } from 'react-redux';
 import { useQuery } from 'react-query';
@@ -22,17 +22,26 @@ import IconButton from '@mui/material/IconButton';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import AddIcon from '@mui/icons-material/Add';
 import PersonIcon from '@mui/icons-material/Person';
-import { useNavigate } from "react-router-dom";
-import Mark from "mark.js";
-
+import { useNavigate } from 'react-router-dom';
+import Mark from 'mark.js';
 
 const Sentence = props => {
-  let { userid, id, text, comments, highlightedPart, usefulnessRating, searchTextIdxs } = props;
+  let {
+    userid,
+    id,
+    text,
+    comments,
+    highlightedPart,
+    usefulnessRating,
+    searchTextIdxs,
+  } = props;
   const [commentSectionOpen, setCommentSectionOpen] = useState(false);
   const [currentCommentText, setCurrentCommentText] = useState('');
-  const [currentCommentsSentence, setCurrentCommentsSentence] = useState(comments);
+  const [currentCommentsSentence, setCurrentCommentsSentence] =
+    useState(comments);
   const [redirectBool, setRedirectBool] = useState(false);
-  const [usefulnessRatingVar, setUsefulnessRatingVar] = useState(usefulnessRating);
+  const [usefulnessRatingVar, setUsefulnessRatingVar] =
+    useState(usefulnessRating);
 
   const navigate = useNavigate();
 
@@ -47,14 +56,14 @@ const Sentence = props => {
   });
 
   useEffect(() => {
-	if (redirectBool === true) {
-		navigate('/user_profile', {replace: true });
-	}
-  }, [redirectBool])
+    if (redirectBool === true) {
+      navigate('/user_profile', { replace: true });
+    }
+  }, [redirectBool]);
 
-  useEffect(() =>{
+  useEffect(() => {
     setUsefulnessRatingVar(usefulnessRating);
-  }, [usefulnessRating])
+  }, [usefulnessRating]);
 
   useEffect(() => {
     if (currentComments && id in currentComments) {
@@ -63,24 +72,22 @@ const Sentence = props => {
     }
     if (searchTextIdxs) {
       let markInstance = new Mark(document.querySelector(`#sentence${id}text`));
-      markInstance.unmark()
+      markInstance.unmark();
       markInstance.markRanges(searchTextIdxs);
     }
   }, [searchTextIdxs]);
 
   const handleCommentOpenButton = async () => {
     console.log('Hi');
-	let res = await axios.get(baseUrl + `/sentence/${id}/comments`);
-	console.log(res.data);
-	setCurrentCommentsSentence(res.data);
+    let res = await axios.get(baseUrl + `/sentence/${id}/comments`);
+    console.log(res.data);
+    setCurrentCommentsSentence(res.data);
     setCommentSectionOpen(true);
   };
 
   const handleCommentText = e => {
     setCurrentCommentText(e.target.value);
-    dispatch(
-      updateCurrentComments({ id, commentText: e.target.value })
-    );
+    dispatch(updateCurrentComments({ id, commentText: e.target.value }));
   };
 
   const handleCloseCommentSection = () => {
@@ -91,52 +98,61 @@ const Sentence = props => {
   };
 
   const handleSubmitComment = async () => {
-	console.log('sub mitting comment')
-	try {
-		const res = await axios.post(baseUrl + '/comment', {
-			text: currentCommentText,
-			submittedBy: localStorage.getItem('userId'),
-			sentenceId: id
-		});
-		const comment = res.data;
-		setCurrentCommentsSentence([...currentCommentsSentence, comment.data ]);
-		setCurrentCommentText('');
-		console.log(comment);
-	} catch (err) {
-		console.log(err);
-	}
-  }
+    console.log('sub mitting comment');
+    try {
+      const res = await axios.post(baseUrl + '/comment', {
+        text: currentCommentText,
+        submittedBy: localStorage.getItem('userId'),
+        sentenceId: id,
+      });
+      const comment = res.data;
+      setCurrentCommentsSentence([...currentCommentsSentence, comment.data]);
+      setCurrentCommentText('');
+      console.log(comment);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  const handleUpvoteSentence = async() => {
-	try {
-		const res = await axios.put(baseUrl + '/sentence/upvote', {
-			id
-		});
-    setUsefulnessRatingVar(usefulnessRatingVar + 1);
-	} catch (err) {
-		console.log(err);
-	}
-  }
+  const handleUpvoteSentence = async () => {
+    try {
+      const res = await axios.put(baseUrl + '/sentence/upvote', {
+        id,
+      });
+      setUsefulnessRatingVar(usefulnessRatingVar + 1);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  const handleSaveSentence = async() => {
-	try {
-		const globalUserId = localStorage.getItem("userId");
-		const res = await axios.put(baseUrl + `/user/${globalUserId}/save/${id}`);
-		const savedSentence = res.data;
-		dispatch(updateUserSavedSentences([...userSavedSentences, {_id: savedSentence._id, text: savedSentence.text, comments: savedSentence.comments}]));
-	} catch (err) {
-		console.log(err);
-	}
-  }
+  const handleSaveSentence = async () => {
+    try {
+      const globalUserId = localStorage.getItem('userId');
+      const res = await axios.put(baseUrl + `/user/${globalUserId}/save/${id}`);
+      const savedSentence = res.data;
+      dispatch(
+        updateUserSavedSentences([
+          ...userSavedSentences,
+          {
+            _id: savedSentence._id,
+            text: savedSentence.text,
+            comments: savedSentence.comments,
+          },
+        ])
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  const handleRedirectToProfile = async() => {
+  const handleRedirectToProfile = async () => {
     console.log(userid);
     const res = await axios.get(baseUrl + `/user/${userid}/sentences`);
     dispatch(updateOtherSavedSentences(res.data.savedSentences));
     dispatch(updateOtherSubmittedSentences(res.data.submittedSentences));
     dispatch(updateUserProfileMode('other'));
     setRedirectBool(true);
-  }
+  };
 
   return (
     <div className={styles.outer}>
@@ -149,35 +165,57 @@ const Sentence = props => {
           }
         >
           <div>
-			<IconButton style={{
-				position: 'absolute',
-				top: '35px'
-			}} onClick={handleRedirectToProfile}> <PersonIcon/> </IconButton>
-            <CardContent id={`sentence${id}text`}
+            <IconButton
               style={{
-				left: '20px',
-				position: 'relative',
+                position: 'absolute',
+                top: '35px',
+              }}
+              onClick={handleRedirectToProfile}
+            >
+              {' '}
+              <PersonIcon />{' '}
+            </IconButton>
+            <CardContent
+              id={`sentence${id}text`}
+              style={{
+                left: '20px',
+                position: 'relative',
                 maxHeight: '200px',
                 overflow: 'auto',
               }}
             >
               {text}
             </CardContent>
-			{/* {usefulnessRatingVar > 0 && <Typography style={{position: 'absolute', left: '79%', bottom: '27%'}}>+{usefulnessRatingVar}</Typography>} */}
-			<IconButton style={{
-				position: 'absolute',
-				left: '79.5%'
-			}} onClick={handleUpvoteSentence}>
-        {usefulnessRatingVar > 0 && <Typography>+{usefulnessRatingVar}</Typography>}
-				<ThumbUpIcon/>
-			</IconButton>
+            {/* {usefulnessRatingVar > 0 && <Typography style={{position: 'absolute', left: '79%', bottom: '27%'}}>+{usefulnessRatingVar}</Typography>} */}
+            <IconButton
+              style={{
+                position: 'absolute',
+                left: '79.5%',
+              }}
+              onClick={handleUpvoteSentence}
+            >
+              {usefulnessRatingVar > 0 && (
+                <Typography
+                  style={{
+                    position: 'absolute',
+                    left: '100%',
+                  }}
+                >
+                  +{usefulnessRatingVar}
+                </Typography>
+              )}
+              <ThumbUpIcon />
+            </IconButton>
 
-			<IconButton style={{
-				position: 'absolute',
-				left: '84%'
-			}} onClick={handleSaveSentence}>
-				<AddIcon/>
-			</IconButton>
+            <IconButton
+              style={{
+                position: 'absolute',
+                left: '84%',
+              }}
+              onClick={handleSaveSentence}
+            >
+              <AddIcon />
+            </IconButton>
 
             <Button
               onClick={handleCommentOpenButton}
@@ -199,11 +237,29 @@ const Sentence = props => {
           <Card style={{ marginTop: '10px', marginBottom: '20px' }}>
             <CardContent className={styles.grid}>
               {currentCommentsSentence.map(comment => {
-				console.log(comment);
-                return <Card key={comment._id} className={styles.card}>
-                  {comment.submittedBy} : {comment.text}
-                </Card>
-				})}
+                console.log(comment);
+                return (
+                  <Card key={comment._id} className={styles.card}>
+                    {comment.submittedBy} : {comment.text}
+                    <Button
+                      onClick={() =>
+                        setCurrentCommentText('@' + comment.submittedBy)
+                      }
+                      style={{
+                        position: 'relative',
+                        top: '4px',
+                        left: '93%',
+                        height: '2em',
+                        width: '6em',
+                        color: 'lavender',
+                        background: '#181818',
+                      }}
+                    >
+                      Reply
+                    </Button>
+                  </Card>
+                );
+              })}
             </CardContent>
             <CardContent>
               <TextField
