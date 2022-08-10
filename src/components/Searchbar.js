@@ -136,7 +136,8 @@ function Searchbar() {
                   speech inside of brackets is also supported, allowing the user
                   to specify which parts of speech they want to fill in the
                   placeholder word with. An example using the parts of speech is
-                  Bob
+                  {`{NN} {VB}`}, which will return all sentences with a matching 
+				  pattern of a noun followed by a verb.
                 </Typography>
               </ListItem>
               <ListItem style={{ display: 'list-item', left: '20px' }}>
