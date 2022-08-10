@@ -109,11 +109,10 @@ function Searchbar() {
 							more backslashes.
 						</Typography>
 						</ListItem>
-						<ListItem style={{ display: 'list-item', left: '20px'}}>
 						<Typography> The second "Highlighted Part" search bar allows you to search for phrases that other users have 
-							highlighted
+							highlighted. Also note that some expansions/contractions are taken care of, eg. "wanna" can be recognized as
+							"want to" when searching.
 						</Typography>
-						</ListItem>
 						<div style={{marginTop: '15px'}}/>
 						<Divider></Divider>
 						<div style={{marginTop: '15px'}}/>

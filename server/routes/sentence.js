@@ -7,6 +7,7 @@ const moment = require('moment');
 var pos = require('pos');
 var nlp = require('compromise');
 const { MongoClient, ObjectId } = require("mongodb");
+const { compareSync } = require('bcrypt');
 const client = new MongoClient("mongodb+srv://root:xuOuq4BJ7cN28MEc@cypress.ofwuv.mongodb.net/language_project");
 client.connect();
 
@@ -25,7 +26,7 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-router.get('/test', async function (req, res, next) {
+router.get('/testdb', async function (req, res, next) {
 	try {
 		const db = client.db('language_project');
 		let aggr_step = {
@@ -47,6 +48,17 @@ router.get('/test', async function (req, res, next) {
 			console.log(doc);
 		}
 		return res.send(sentences);	
+	} catch (err) {
+		console.log(err);
+		return res.status(500).send(err);
+	}
+})
+
+router.get('/testpos', async function (req, res, next) {
+	try {
+		let expanded = nlp('wanna').contractions().expand().text();
+		let tried = nlp('want to').contract().text();
+		return res.send(tried);	
 	} catch (err) {
 		console.log(err);
 		return res.status(500).send(err);
@@ -180,17 +192,87 @@ const searchHasPos = (txtArr) => {
 	return false;
 }
 
-const nthOccurence = (str, match, n) => {
-    var L= str.length, i= -1;
-    while(n-- && i++<L){
-        i= str.indexOf(match, i);
-        if (i < 0) break;
-    }
-    return i;
+function isLetter(str) {
+	return str && str.length === 1 && str.match(/[a-z]/i);
 }
 
-function isLetter(str) {
-	return str.length === 1 && str.match(/[a-z]/i);
+function updateEltIdxExactWords(elt, exactWords) {
+	for (let exactWord of exactWords) {
+		let lastSeenIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
+		if (lastSeenIdx !== -1 && !isLetter(elt.text.toLowerCase()[lastSeenIdx])) lastSeenIdx++;
+		while (lastSeenIdx !== -1) {
+			console.log(lastSeenIdx);
+			elt['searchTextIdxs'].push({start: lastSeenIdx, length: exactWord.length});
+			let slicedString = elt.text.slice(lastSeenIdx + 1);
+			let tempLastSeenIdx = slicedString.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
+			if (tempLastSeenIdx === -1) {
+				lastSeenIdx = -1;
+				break;
+			}
+
+			if (!isLetter(slicedString[tempLastSeenIdx])) tempLastSeenIdx++;
+			lastSeenIdx = lastSeenIdx + tempLastSeenIdx + 1;
+		}
+	}
+}
+
+function updateEltIdxMainSearch(elt, regexString, searchIdx) {
+	// finding length of corresponding text in the search res
+	let regexStringIdx = 0;
+	let searchResIdx = searchIdx;
+	while (regexStringIdx < regexString.length && searchResIdx < elt.text.length) {
+		if (regexString[regexStringIdx] === '[' || regexString[regexStringIdx] === '(') {
+			if (regexString[regexStringIdx] === '[') {
+				// search until next space
+				let nxtSpace = elt.text.indexOf(' ', searchResIdx);
+				if (nxtSpace === -1) {
+					// current word is end of sentence
+					searchResIdx = elt.text.length;
+					break;
+				} else {
+					// found next space, need to reset loop
+					regexStringIdx = regexStringIdx + 10;
+					searchResIdx = nxtSpace + 1;
+				}
+			} else {
+				// we encountered '('
+				console.log('in encountering (')
+				let closingBracketIdx = regexString.indexOf(')', regexStringIdx);
+				let bracketContents = regexString.slice(regexStringIdx + 1, closingBracketIdx);
+				let bracketContentsSplit = bracketContents.split('|');
+				console.log(bracketContentsSplit);
+				console.log(bracketContentsSplit[0].length)
+				console.log(elt.text.substring(searchResIdx, bracketContentsSplit[0].length))
+				console.log(elt.text.substring(searchResIdx, bracketContentsSplit[1].length))
+				if ((elt.text.substring(searchResIdx, bracketContentsSplit[0].length + searchResIdx) === bracketContentsSplit[0] &&
+					bracketContentsSplit[0].includes(' ')) ||
+					(elt.text.substring(searchResIdx, bracketContentsSplit[1].length + searchResIdx) === bracketContentsSplit[1] &&
+					bracketContentsSplit[1].includes(' '))) {
+						console.log('in double word');
+						// corresponds to double word
+					let firstSpace = elt.text.indexOf(' ', searchResIdx);
+					let secondSpace = elt.text.indexOf(' ', firstSpace + 1);
+					if (secondSpace === -1) {
+						searchResIdx = elt.text.length; 
+						break;
+					}
+					searchResIdx = secondSpace + 1;
+					regexStringIdx = closingBracketIdx + 2;
+				} else {
+					// corresponds to single word
+					let firstSpace = elt.text.indexOf(' ', searchResIdx);
+					searchResIdx = firstSpace + 1;
+					regexStringIdx = closingBracketIdx + 2;
+				}	
+			}
+		} else {
+			regexStringIdx++;
+			searchResIdx++;
+		}
+	}
+	if (searchResIdx < elt.text.length && isLetter(elt.text[searchResIdx])) searchResIdx--;
+	elt['searchTextIdxs'] = [];
+	elt['searchTextIdxs'].push({start: searchIdx, length: searchResIdx - searchIdx})
 }
 
 
@@ -303,36 +385,11 @@ router.get('/search', async function (req, res, next) {
 			for (let elt of searchRes) {
 				elt['searchTextIdxs'] = [];
 				if (regexString) {
-					// let searchIdx = elt.text.toLowerCase().search(`(^|.* )"*${regexString}($|["'*\\.\\?,! ]+ *.*)`);
 					let searchIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${regexString}([ \\.,\\?"'!]|$)`)
 					if (!isLetter(elt.text[searchIdx])) searchIdx++;
-					elt['searchTextIdxs'].push({start: searchIdx, length: searchTextNoNots.length})
+					updateEltIdxMainSearch(elt, regexString, searchIdx);
 				}
-				for (let exactWord of exactWords) {
-					// console.log(`on exact word ${exactWord}`);
-					// console.log(`for text ${elt.text}`);
-					// let nthCount = 1;
-					// let i = nthOccurence(elt.text, exactWord, nthCount);
-					// while (i !== -1) {
-					// 	console.log(`first i is ${i}`)
-					// 	elt['searchTextIdxs'].push({start: i, length: exactWord.length});
-					// 	i = nthOccurence(elt.text, exactWord, ++nthCount);
-					// }
-					let lastSeenIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
-					if (lastSeenIdx !== -1 && !isLetter(elt.text.toLowerCase()[lastSeenIdx])) lastSeenIdx++;
-					while (lastSeenIdx !== -1) {
-						elt['searchTextIdxs'].push({start: lastSeenIdx, length: exactWord.length});
-						let slicedString = elt.text.slice(lastSeenIdx + 1);
-						let tempLastSeenIdx = slicedString.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
-						if (tempLastSeenIdx === -1) {
-							lastSeenIdx = -1;
-							break;
-						}
-
-						if (!isLetter(slicedString[tempLastSeenIdx])) tempLastSeenIdx++;
-						lastSeenIdx = lastSeenIdx + tempLastSeenIdx + 1;
-					}
-				}
+				updateEltIdxExactWords(elt, exactWords);
 			}
 			return res.send(searchRes);
 		} else {
@@ -354,46 +411,51 @@ router.get('/search', async function (req, res, next) {
 					}
 				}
 				let text = elt.text;
-				let searchIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${regexString}([ \\.,\\?"'!]|$)`)
-				if (!isLetter(elt.text[searchIdx])) searchIdx++;
-				elt['searchTextIdxs'] = [{start: searchIdx, length: searchTextNoNots.length}];
-				for (let exactWord of exactWords) {
-					let lastSeenIdx = elt.text.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
-					if (lastSeenIdx !== -1 && !isLetter(elt.text.toLowerCase()[lastSeenIdx])) lastSeenIdx++;
-					while (lastSeenIdx !== -1) {
-						elt['searchTextIdxs'].push({start: lastSeenIdx, length: exactWord.length});
-						let slicedString = elt.text.slice(lastSeenIdx + 1);
-						let tempLastSeenIdx = slicedString.toLowerCase().search(`(^|[ \\.,\\?"'!])${exactWord}([ \\.,\\?"'!]|$)`)
-						if (tempLastSeenIdx === -1) {
-							lastSeenIdx = -1;
-							break;
-						}
 
-						if (!isLetter(slicedString[tempLastSeenIdx])) tempLastSeenIdx++;
-						lastSeenIdx = lastSeenIdx + tempLastSeenIdx;
+				let includeCurrentEltOverall = false;
+				let start_idx = 0;
+				let searchIdx = -1;
+
+				while (!includeCurrentEltOverall) {
+					let includeCurrentEltCurrIter = true;
+					searchIdx = elt.text.slice(start_idx, elt.text.length).toLowerCase().search(`(^|[ \\.,\\?"'!])${regexString}([ \\.,\\?"'!]|$)`)
+					if (searchIdx === -1) break;
+					if (!isLetter(elt.text[searchIdx])) searchIdx++;
+
+					console.log(searchIdx);
+					console.log(start_idx);
+					// finding the relative word position for POS string in the element text
+					let counter = 0;
+					for (let i = 0; i < searchIdx + start_idx; i++) {
+						if (text[i] === ' ') {
+							counter++;
+						}
 					}
-				}
-				let counter = 0;
-				for (let i = 0; i < idx; i++) {
-					if (text[i] === ' ') {
-						counter++;
-					}
-				}
-				let includeCurrentElt = true;
-				// counter represents idx of the corresponding word to the searchText to start from 
-				for (let i = 0; i < searchTextArr.length; i++,counter++) {
-					if (searchTextArr[i][0] === '{') {
-						let posText = searchTextArr[i].slice(1, -1);
-						if (posText.length > 0) {
-							if (posText !== elt.posString[counter]) {
-								includeCurrentElt = false;
-								break;
+					for (let i = 0; i < searchTextArr.length; i++,counter++) {
+						if (searchTextArr[i][0] === '{') {
+							let posText = searchTextArr[i].slice(1, -1);
+							if (posText.length > 0) {
+								if (posText !== elt.posString[counter]) {
+									includeCurrentEltCurrIter = false;
+									break;
+								}
 							}
 						}
 					}
+					if (includeCurrentEltCurrIter) {
+						includeCurrentEltOverall = true;
+					} else start_idx = start_idx + searchIdx + 1;
 				}
+
+				if (searchIdx !== -1) {
+					updateEltIdxMainSearch(elt, regexString, start_idx + searchIdx);
+					updateEltIdxExactWords(elt, exactWords);
+					returnRes.push(elt);
+				}
+				// counter represents idx of the corresponding word to the searchText to start from 
+				// need to account for case {JJ} -> exhaust all cases until we can return a result
 	
-				if (includeCurrentElt) returnRes.push(elt);
+				// if (includeCurrentElt) returnRes.push(elt);
 				if (returnRes.length === 10) {
 					return res.send(returnRes);
 				}
