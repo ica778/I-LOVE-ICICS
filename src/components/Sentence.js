@@ -43,6 +43,8 @@ const Sentence = props => {
   const [usefulnessRatingVar, setUsefulnessRatingVar] =
     useState(usefulnessRating);
 
+  const [currentCommentUser, setCurrentCommentUser] = useState('');
+
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -154,6 +156,11 @@ const Sentence = props => {
     setRedirectBool(true);
   };
 
+  const handleGrabUsername = async usersId => {
+    const res = await axios.get(baseUrl + `/user/${usersId}/username`);
+    setCurrentCommentUser(res.data);
+  };
+
   return (
     <div className={styles.outer}>
       <div className={styles.container}>
@@ -237,13 +244,14 @@ const Sentence = props => {
           <Card style={{ marginTop: '10px', marginBottom: '20px' }}>
             <CardContent className={styles.grid}>
               {currentCommentsSentence.map(comment => {
-                console.log(comment);
+                //console.log(comment);
+                handleGrabUsername(comment.submittedBy);
                 return (
                   <Card key={comment._id} className={styles.card}>
                     {comment.submittedBy} : {comment.text}
                     <Button
                       onClick={() =>
-                        setCurrentCommentText('@' + comment.submittedBy)
+                        setCurrentCommentText('@' + currentCommentUser)
                       }
                       style={{
                         position: 'relative',
