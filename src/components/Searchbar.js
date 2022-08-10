@@ -251,7 +251,7 @@ function Searchbar() {
           style={{
             variant: 'outlined',
             position: 'absolute',
-            bottom: '60%',
+            bottom: '50%',
             right: '5%',
             background: '#01326c',
             color: 'white',
