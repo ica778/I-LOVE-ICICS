@@ -16,7 +16,11 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import { baseUrl } from '../config';
 import { useSelector, useDispatch } from 'react-redux';
-import { bottomOfPage, updateExploreSentences, setExploreSentences } from '../actions';
+import {
+  bottomOfPage,
+  updateExploreSentences,
+  setExploreSentences,
+} from '../actions';
 
 const modalStyle = {
   position: 'absolute',
@@ -55,31 +59,36 @@ function Explore() {
         fetchSentences(exploreSentences[exploreSentences.length - 1]._id);
       }
       dispatch(bottomOfPage(null));
-      setTimeout(function() {
+      setTimeout(function () {
         dispatch(bottomOfPage(false));
       }, 250);
     }
-  }, [atBottomOfPage])
+  }, [atBottomOfPage]);
 
   async function fetchSentences(id) {
-    console.log(exploreSentences[exploreSentences.length - 1].text)
+    console.log(exploreSentences[exploreSentences.length - 1].text);
     console.log(id);
     let res;
 
     if (!id) {
       res = await axios.get(baseUrl + '/sentence/recent50', {
-      params: {
-        populate, orderKey, timeFilterKey
-      }
-    })
+        params: {
+          populate,
+          orderKey,
+          timeFilterKey,
+        },
+      });
     } else {
       res = await axios.get(baseUrl + '/sentence/recent50', {
         params: {
-          populate, orderKey, timeFilterKey, sentenceId: id
-        }
-      })
+          populate,
+          orderKey,
+          timeFilterKey,
+          sentenceId: id,
+        },
+      });
     }
-    
+
     dispatch(updateExploreSentences(res.data));
   }
 
@@ -88,19 +97,20 @@ function Explore() {
     let res;
     res = await axios.get(baseUrl + '/sentence/recent50', {
       params: {
-        populate, orderKey, timeFilterKey
-      }
-    })
+        populate,
+        orderKey,
+        timeFilterKey,
+      },
+    });
     dispatch(setExploreSentences(res.data));
   }
 
   useEffect(() => {
-	  updateSentences()
-  }, [orderKey, timeFilterKey])
+    updateSentences();
+  }, [orderKey, timeFilterKey]);
 
   return (
-    <div id='parentdiv'>
-
+    <div id="parentdiv">
       <div className={styles.dropBox}>
         <FormControl className={styles.dropDown}>
           <InputLabel>From:</InputLabel>
@@ -116,7 +126,7 @@ function Explore() {
         </FormControl>
       </div>
 
-	  <div className={styles.dropBox}>
+      <div className={styles.dropBox}>
         <FormControl className={styles.dropDown}>
           <InputLabel>Order By</InputLabel>
           <Select
@@ -125,7 +135,7 @@ function Explore() {
             onChange={e => setOrderKey(e.target.value)}
           >
             <MenuItem value={'trending'}>Trending</MenuItem>
-			<MenuItem value={'recent'}>Recent</MenuItem>
+            <MenuItem value={'recent'}>Recent</MenuItem>
           </Select>
         </FormControl>
       </div>
@@ -137,7 +147,7 @@ function Explore() {
         <Box sx={modalStyle}>
           {selectedSentence ? (
             <Sentence
-			  userid={selectedSentence.submittedBy}
+              userid={selectedSentence.submittedBy}
               id={selectedSentence._id}
               text={selectedSentence.text}
               comments={selectedSentence.comments}
@@ -147,10 +157,10 @@ function Explore() {
         </Box>
       </Modal>
 
-      <div id="hey" style={{overflow: 'auto'}}>
+      <div id="hey" style={{ overflow: 'auto' }}>
         {exploreSentences.map(sentence => (
           <div
-		    userid={sentence.submittedBy}
+            userid={sentence.submittedBy}
             key={sentence._id}
             className={styles.card}
             onClick={() => setSelectedSentence(sentence)}
