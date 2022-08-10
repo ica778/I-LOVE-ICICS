@@ -1,0 +1,45 @@
+h1 {
+  color: #282828;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(30em, auto));
+  grid-auto-rows: minmax(200px, auto);
+  grid-gap: 2em;
+}
+
+.card {
+  background-color: #282828;
+  color: lavender;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 2em;
+  padding-bottom: 3em;
+  border: 1px solid #181818;
+  margin: 1em;
+  transition: border 0.2s;
+  max-height: 200px;
+  overflow: auto;
+
+  &:hover {
+    border: 4px solid orange;
+  }
+}
+
+.dropBox {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-right: 2em;
+  margin-top: 10px;
+  margin-bottom: 1em;
+}
+
+.dropDown {
+  width: 12em;
+}

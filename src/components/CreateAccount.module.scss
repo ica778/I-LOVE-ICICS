@@ -1,0 +1,40 @@
+
+.createBox {
+    position: relative;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    margin-top: 15em;
+    padding: 1.5em;
+    border: solid;
+    border-width: 2px;
+    border-color: black;
+}
+
+.formControl {
+    display: flex;
+    flex-direction: column;
+    margin-right: 2em;
+}
+
+.formControl label {
+    font-size: large;
+    color: black;
+}
+
+.controls {
+    width: 100%;
+    opacity: 40%;
+    margin-top: 0.3em;  
+    display: grid;
+    border: solid;
+    border-color: black;
+
+    transition: border 0.2s;
+
+    &:hover {
+        border: 2px solid blue;
+    }
+}
+
