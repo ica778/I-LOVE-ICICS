@@ -50,7 +50,9 @@ For next steps, I believe we’d first like to polish up some of the edges on th
 ## Contributions:
 
 •	Roy Chen: The most significant area in which Roy contributed would have to be related to the search functionality. Because we created our own custom search engine and logic, Roy spent a large portion of his time creating, polishing, and testing the different customizable components of searching, in particular, Roy focused a lot on optimizing filtering (especially with the Parts of Speech filter) and fine tuning our regex. Additionally, he also focused on our functionality to add sentences, in particular the ability to highlight parts of sentences to mark them as ‘important’
+
 •	Ethan Ly: The most significant area in which Ethan contributed would be the Explore page as well as the incorporation of comments, users, and sentences. Ethan managed a lot of the backend routing/endpoints for our server and also structured many of the schemas deciding on how our main data points (Sentences, Comments, Users) would be stored in the database. Additionally, he also worked on a large portion of the styling and layout for the web application’s front-end UI.
+
 •	Ian Cheng: The most significant area in which Ian contributed would be related to the user functionality. Ian managed many user pages such as account creation, and login encryption. He also worked on the layout and functionalities of the user profile page. Additionally, he also worked on the pages to edit user profiles and search for other users however due to time constraints and merge conflicts, we were unable to polish these functions enough to finish it in our final submission.
 
 
